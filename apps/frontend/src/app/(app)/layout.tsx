@@ -6,13 +6,8 @@ import 'react-tooltip/dist/react-tooltip.css';
 import '@copilotkit/react-ui/styles.css';
 import LayoutContext from '@gitroom/frontend/components/layout/layout.context';
 import { ReactNode } from 'react';
-import { jakartaSans } from '@gitroom/frontend/fonts/plus-jakarta-sans/plus.jakarta.sans.font';
-import PlausibleProvider from 'next-plausible';
-import clsx from 'clsx';
 import { VariableContextComponent } from '@gitroom/react/helpers/variable.context';
-import { Fragment } from 'react';
 import UtmSaver from '@gitroom/helpers/utils/utm.saver';
-import { DubAnalytics } from '@gitroom/frontend/components/layout/dubAnalytics';
 import { FacebookComponent } from '@gitroom/frontend/components/layout/facebook.component';
 import { GoogleTagManagerComponent } from '@gitroom/frontend/components/layout/gtm.component';
 import { cookies } from 'next/headers';
@@ -21,31 +16,19 @@ import {
   fallbackLng,
 } from '@gitroom/react/translation/i18n.config';
 import { HtmlComponent } from '@gitroom/frontend/components/layout/html.component';
-import Script from 'next/script';
 import { ChangeDirClient } from '@gitroom/frontend/components/new-layout/change.dir.client';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();
   const language = cookieStore.get(cookieName)?.value || fallbackLng;
-  const Plausible = !!process.env.STRIPE_PUBLISHABLE_KEY
-    ? PlausibleProvider
-    : Fragment;
   return (
     <html>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        {!!process.env.DATAFAST_WEBSITE_ID && (
-          <Script
-            data-website-id={process.env.DATAFAST_WEBSITE_ID}
-            data-domain="postiz.com"
-            src="https://datafa.st/js/script.js"
-            strategy="afterInteractive"
-          />
-        )}
       </head>
       <ChangeDirClient />
       <body
-        className={clsx(jakartaSans.className, 'dark text-primary !bg-primary')}
+        className={'dark text-primary !bg-primary'}
       >
         <VariableContextComponent
           storageProvider={
@@ -97,17 +80,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         >
           <SentryComponent>
             <HtmlComponent />
-            <DubAnalytics />
             <FacebookComponent />
             <GoogleTagManagerComponent gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
-            <Plausible
-              domain={!!process.env.IS_GENERAL ? 'postiz.com' : 'gitroom.com'}
-            >
-              <LayoutContext>
-                <UtmSaver />
-                {children}
-              </LayoutContext>
-            </Plausible>
+            <LayoutContext>
+              <UtmSaver />
+              {children}
+            </LayoutContext>
           </SentryComponent>
         </VariableContextComponent>
       </body>

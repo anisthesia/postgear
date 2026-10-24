@@ -49,7 +49,7 @@ export const AnalyticsComponent: FC = () => {
       {/*                    </div>*/}
       {/*                    <div className="self-stretch text-neutral-400 text-xs font-normal">O atual sistema político precisa mudar para valorizar o trabalho e garantir igualdade de oportunidad</div>*/}
       {/*                    <div className="self-stretch justify-start items-center gap-1 inline-flex">*/}
-      {/*                        <div className="text-customColor10 text-xs font-normal">See Tweet</div>*/}
+      {/*                        <div className="text-textItemBlur text-xs font-normal">See Tweet</div>*/}
       {/*                        <div className="w-4 h-4 relative"/>*/}
       {/*                    </div>*/}
       {/*                </div>*/}
@@ -63,7 +63,7 @@ export const AnalyticsComponent: FC = () => {
       {/*                    </div>*/}
       {/*                    <div className="self-stretch text-neutral-400 text-xs font-normal">O atual sistema político precisa mudar para valorizar o trabalho e garantir igualdade de oportunidad</div>*/}
       {/*                    <div className="self-stretch justify-start items-center gap-1 inline-flex">*/}
-      {/*                        <div className="text-customColor10 text-xs font-normal">See Tweet</div>*/}
+      {/*                        <div className="text-textItemBlur text-xs font-normal">See Tweet</div>*/}
       {/*                        <div className="w-4 h-4 relative"/>*/}
       {/*                    </div>*/}
       {/*                </div>*/}
@@ -77,7 +77,7 @@ export const AnalyticsComponent: FC = () => {
       {/*                    </div>*/}
       {/*                    <div className="self-stretch text-neutral-400 text-xs font-normal">O atual sistema político precisa mudar para valorizar o trabalho e garantir igualdade de oportunidad</div>*/}
       {/*                    <div className="self-stretch justify-start items-center gap-1 inline-flex">*/}
-      {/*                        <div className="text-customColor10 text-xs font-normal">See Tweet</div>*/}
+      {/*                        <div className="text-textItemBlur text-xs font-normal">See Tweet</div>*/}
       {/*                        <div className="w-4 h-4 relative"/>*/}
       {/*                    </div>*/}
       {/*                </div>*/}
@@ -91,7 +91,7 @@ export const AnalyticsComponent: FC = () => {
       {/*                    </div>*/}
       {/*                    <div className="self-stretch text-neutral-400 text-xs font-normal">O atual sistema político precisa mudar para valorizar o trabalho e garantir igualdade de oportunidad</div>*/}
       {/*                    <div className="self-stretch justify-start items-center gap-1 inline-flex">*/}
-      {/*                        <div className="text-customColor10 text-xs font-normal">See Tweet</div>*/}
+      {/*                        <div className="text-textItemBlur text-xs font-normal">See Tweet</div>*/}
       {/*                        <div className="w-4 h-4 relative"/>*/}
       {/*                    </div>*/}
       {/*                </div>*/}
@@ -105,7 +105,7 @@ export const AnalyticsComponent: FC = () => {
       {/*                    </div>*/}
       {/*                    <div className="self-stretch text-neutral-400 text-xs font-normal">O atual sistema político precisa mudar para valorizar o trabalho e garantir igualdade de oportunidad</div>*/}
       {/*                    <div className="self-stretch justify-start items-center gap-1 inline-flex">*/}
-      {/*                        <div className="text-customColor10 text-xs font-normal">See Tweet</div>*/}
+      {/*                        <div className="text-textItemBlur text-xs font-normal">See Tweet</div>*/}
       {/*                        <div className="w-4 h-4 relative"/>*/}
       {/*                    </div>*/}
       {/*                </div>*/}

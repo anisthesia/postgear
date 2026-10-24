@@ -34,7 +34,8 @@ export const ContextWrapper: FC<{
   const values = user
     ? {
         ...user,
-        tier: pricing[user.tier],
+        // postgear has no paid tiers: every gate resolves as the top tier
+        tier: pricing.ULTIMATE,
       }
     : ({} as any);
   return <UserContext.Provider value={values}>{children}</UserContext.Provider>;

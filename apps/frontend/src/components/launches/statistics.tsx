@@ -168,13 +168,13 @@ export const StatisticsModal: FC<{
                 </div>
                 {statisticsData?.clicks?.map((p: any) => (
                   <Fragment key={p.short}>
-                    <div className="p-[4px] py-[10px] bg-customColor6">
+                    <div className="p-[4px] py-[10px] bg-fifth">
                       {p.short}
                     </div>
-                    <div className="p-[4px] py-[10px] bg-customColor6">
+                    <div className="p-[4px] py-[10px] bg-fifth">
                       {p.original}
                     </div>
-                    <div className="p-[4px] py-[10px] bg-customColor6">
+                    <div className="p-[4px] py-[10px] bg-fifth">
                       {p.clicks}
                     </div>
                   </Fragment>

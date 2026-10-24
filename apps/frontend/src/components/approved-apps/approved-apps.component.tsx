@@ -61,16 +61,16 @@ export const ApprovedAppsComponent: FC = () => {
 
   return (
     <div className="flex flex-col gap-[20px]">
-      <div className="text-customColor18">
+      <div className="text-textItemBlur">
         {t(
           'apps_you_have_authorized',
-          'Applications you have authorized to access your Postiz account.'
+          'Applications you have authorized to access your postgear account.'
         )}
       </div>
 
       <div className="bg-sixth border-fifth border rounded-[4px] p-[24px]">
         {!apps?.length ? (
-          <div className="text-customColor18">
+          <div className="text-textItemBlur">
             {t('no_approved_apps', 'No approved apps yet.')}
           </div>
         ) : (
@@ -88,7 +88,7 @@ export const ApprovedAppsComponent: FC = () => {
                       className="w-[40px] h-[40px] rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-[40px] h-[40px] rounded-full bg-fifth flex items-center justify-center text-customColor18">
+                    <div className="w-[40px] h-[40px] rounded-full bg-fifth flex items-center justify-center text-textItemBlur">
                       {app.oauthApp?.name?.[0]?.toUpperCase() || '?'}
                     </div>
                   )}
@@ -97,11 +97,11 @@ export const ApprovedAppsComponent: FC = () => {
                       {app.oauthApp?.name}
                     </div>
                     {app.oauthApp?.description && (
-                      <div className="text-customColor18 text-[12px]">
+                      <div className="text-textItemBlur text-[12px]">
                         {app.oauthApp.description}
                       </div>
                     )}
-                    <div className="text-customColor18 text-[12px]">
+                    <div className="text-textItemBlur text-[12px]">
                       {t('authorized_on', 'Authorized on')}{' '}
                       {new Date(app.createdAt).toLocaleDateString(undefined, {
                         timeZone: getTimezone(),

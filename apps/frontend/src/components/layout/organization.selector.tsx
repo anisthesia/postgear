@@ -46,7 +46,7 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
       <div className="hover:text-newTextColor">
         <div className="group text-[12px] relative">
           {asOpenSelect && (
-            <div className="bg-btnPrimary !flex !relative max-w-[500px] mx-auto py-[12px] px-[12px]">Select Organization</div>
+            <div className="bg-btnPrimary text-accentFg !flex !relative max-w-[500px] mx-auto py-[12px] px-[12px]">Select Organization</div>
           )}
           {!asOpenSelect && (
             <div className="flex items-center gap-[6px]">
@@ -88,7 +88,7 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
                   >
                     {org?.name}
                     {!!org?.users?.[0]?.role && (
-                      <span className="text-customColor18">
+                      <span className="text-textItemBlur">
                         {' '}
                         (
                         {org?.users?.[0]?.role === 'SUPERADMIN'

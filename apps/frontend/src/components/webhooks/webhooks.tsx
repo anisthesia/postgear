@@ -63,10 +63,10 @@ export const Webhooks: FC = () => {
       <h3 className="text-[20px]">
         {t('webhooks', 'Webhooks')} ({data?.length || 0}/{user?.tier?.webhooks})
       </h3>
-      <div className="text-customColor18 mt-[4px]">
+      <div className="text-textItemBlur mt-[4px]">
         {t(
           'webhooks_are_a_way_to_get_notified_when_something_happens_in_postiz_via_an_http_request',
-          'Webhooks are a way to get notified when something happens in Postiz via\n        an HTTP request.'
+          'Webhooks are a way to get notified when something happens in postgear via\n        an HTTP request.'
         )}
       </div>
       <div className="my-[16px] mt-[16px] bg-sixth border-fifth items-center border rounded-[4px] p-[24px] flex gap-[24px]">
