@@ -116,3 +116,4 @@ output "public_ip"   { value = aws_eip.postgear.public_ip }
 output "url"         { value = "https://${var.domain}" }
 output "ssh"         { value = "ssh -i ~/.ssh/postgear_aws ubuntu@${aws_eip.postgear.public_ip}" }
 output "instance_id" { value = aws_instance.postgear.id }
+output "security_group_id" { value = aws_security_group.postgear.id }

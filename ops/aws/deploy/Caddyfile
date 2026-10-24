@@ -3,5 +3,11 @@
 	request_body {
 		max_size 1GB
 	}
-	reverse_proxy postiz:5000
+	handle_path /legal/* {
+		root * /srv/legal
+		file_server
+	}
+	handle {
+		reverse_proxy postiz:5000
+	}
 }

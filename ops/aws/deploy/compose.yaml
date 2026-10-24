@@ -13,6 +13,7 @@ services:
       DOMAIN: ${DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./legal:/srv/legal:ro
       - caddy-data:/data
       - caddy-config:/config
     depends_on:

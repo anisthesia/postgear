@@ -9,6 +9,7 @@ HOST="$(terraform output -raw public_ip)"
 DOMAIN="${DOMAIN:-social.ridepro.in}"
 POSTIZ_TAG="${POSTIZ_TAG:-v2.25.2}"
 KEY="${KEY:-$HOME/.ssh/postgear_aws}"
+"$PWD/allow-my-ip.sh"
 SSH=(ssh -i "$KEY" -o StrictHostKeyChecking=accept-new "ubuntu@$HOST")
 
 echo "[deploy] waiting for first-boot setup on $HOST"
