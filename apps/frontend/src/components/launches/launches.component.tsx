@@ -28,8 +28,6 @@ import { NewPost } from '@gitroom/frontend/components/launches/new.post';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useIntegrationList } from '@gitroom/frontend/components/launches/helpers/use.integration.list';
 import useCookie from 'react-use-cookie';
-import { Onboarding } from '@gitroom/frontend/components/onboarding/onboarding';
-import { ChannelsAfterPayment } from '@gitroom/frontend/components/layout/check.payment';
 import { HubspotInstalled } from '@gitroom/frontend/components/launches/hubspot.installed';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
 import { Input } from '@gitroom/react/form/input';
@@ -627,8 +625,6 @@ export const LaunchesComponent = () => {
   // @ts-ignore
   return (
     <DNDProvider>
-      <Onboarding />
-      <ChannelsAfterPayment integrations={integrations} />
       <HubspotInstalled />
       <CalendarWeekProvider integrations={sortedIntegrations}>
         {channelsOpen && (

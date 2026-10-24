@@ -2,8 +2,6 @@
 
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
-import { useRouter } from 'next/navigation';
-import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { classValidatorResolver } from '@hookform/resolvers/class-validator';
@@ -322,22 +320,9 @@ export const GeneratorPopup = () => {
 export const GeneratorComponent = () => {
   const t = useT();
   const user = useUser();
-  const router = useRouter();
   const modal = useModals();
   const all = useCalendar();
   const generate = useCallback(async () => {
-    if (!user?.tier?.ai) {
-      if (
-        await deleteDialog(
-          t('upgrade_required', 'You need to upgrade to use this feature'),
-          t('move_to_billing', 'Move to billing'),
-          t('payment_required', 'Payment Required')
-        )
-      ) {
-        router.push('/billing');
-      }
-      return;
-    }
     modal.openModal({
       title: t('generate_posts', 'Generate Posts'),
       withCloseButton: false,

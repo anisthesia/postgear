@@ -12,7 +12,6 @@ interface MenuItemInterface {
   path: string;
   role?: string[];
   hide?: boolean;
-  requireBilling?: boolean;
   onClick?: () => void;
 }
 
@@ -106,29 +105,6 @@ export const useMenuItem = () => {
 
   const secondMenu = [
     {
-      name: t('billing', 'Billing'),
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="21"
-          viewBox="0 0 20 21"
-          fill="none"
-        >
-          <path
-            d="M7.08341 12.7225C7.08341 13.7964 7.95397 14.667 9.02786 14.667H10.8334C11.984 14.667 12.9167 13.7343 12.9167 12.5837C12.9167 11.4331 11.984 10.5003 10.8334 10.5003H9.16675C8.01615 10.5003 7.08341 9.56759 7.08341 8.41699C7.08341 7.2664 8.01615 6.33366 9.16675 6.33366H10.9723C12.0462 6.33366 12.9167 7.20422 12.9167 8.2781M10.0001 5.08366V6.33366M10.0001 14.667V15.917M18.3334 10.5003C18.3334 15.1027 14.6025 18.8337 10.0001 18.8337C5.39771 18.8337 1.66675 15.1027 1.66675 10.5003C1.66675 5.89795 5.39771 2.16699 10.0001 2.16699C14.6025 2.16699 18.3334 5.89795 18.3334 10.5003Z"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ),
-      path: '/billing',
-      role: ['ADMIN', 'SUPERADMIN'],
-      requireBilling: true,
-    },
-    {
       name: t('settings', 'Settings'),
       icon: (
         <svg
@@ -169,24 +145,15 @@ export const useMenuItem = () => {
 export const TopMenu: FC = () => {
   const user = useUser();
   const { firstMenu, secondMenu } = useMenuItem();
-  const { isGeneral, billingEnabled } = useVariables();
   return (
     <>
       <div className="flex flex-1 flex-col minCustom:gap-[20px] custom:gap-[8px] blurMe">
         {
           // @ts-ignore
           user?.orgId &&
-            // @ts-ignore
-            (user.tier !== 'FREE' || !isGeneral || !billingEnabled) &&
             firstMenu
               .filter((f) => {
                 if (f.hide) {
-                  return false;
-                }
-                if (f.requireBilling && !billingEnabled) {
-                  return false;
-                }
-                if (f.name === 'Billing' && user?.isLifetime) {
                   return false;
                 }
                 if (f.role) {
@@ -209,12 +176,6 @@ export const TopMenu: FC = () => {
         {secondMenu
           .filter((f) => {
             if (f.hide) {
-              return false;
-            }
-            if (f.requireBilling && !billingEnabled) {
-              return false;
-            }
-            if (f.name === 'Billing' && user?.isLifetime) {
               return false;
             }
             if (f.role) {

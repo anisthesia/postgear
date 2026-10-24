@@ -2,7 +2,6 @@
 
 import { ReactNode, useCallback } from 'react';
 import { FetchWrapperComponent } from '@gitroom/helpers/utils/custom.fetch';
-import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
 import { useReturnUrl } from '@gitroom/frontend/app/(app)/auth/return.url.component';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
 export default function LayoutContext(params: { children: ReactNode }) {
@@ -87,39 +86,6 @@ function LayoutContextInner(params: { children: ReactNode }) {
           setCookie('impersonate', '', -10);
         }
         window.location.href = '/';
-      }
-      if (response.status === 406) {
-        if (
-          await deleteDialog(
-            "This feature is not available during the trial. You can end the trial now: your plan's first payment is charged today instead of at the end of the trial.",
-            'End trial and pay now',
-            'Trial',
-
-          )
-        ) {
-          window.open('/billing?finishTrial=true', '_blank');
-          return false;
-        }
-        return false;
-      }
-
-      if (response.status === 402) {
-        if (
-          await deleteDialog(
-            (
-              await response
-                .clone()
-                .json()
-                .catch(() => ({}))
-            ).message,
-            'Move to billing',
-            'Payment Required'
-          )
-        ) {
-          window.open('/billing', '_blank');
-          return false;
-        }
-        return true;
       }
       return true;
     },
