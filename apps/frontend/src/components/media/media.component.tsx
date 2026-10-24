@@ -1136,7 +1136,7 @@ export const MediaComponent: FC<{
         <Button onClick={showModal}>{t('select', 'Select')}</Button>
         <Button
           onClick={showDesignModal}
-          className="!bg-btnPrimary mobile:hidden"
+          className="!bg-btnPrimary !text-accentFg mobile:hidden"
         >
           {t('editor', 'Editor')}
         </Button>

@@ -16,7 +16,7 @@ export interface MobileTopBarAction {
 }
 
 const actionColors = {
-  primary: 'bg-btnPrimary text-white',
+  primary: 'bg-btnPrimary text-accentFg',
   secondary: 'bg-[#D82D7E] text-white',
   tertiary: 'bg-btnSimple text-btnText',
 };
@@ -49,7 +49,7 @@ export const MobileTopBar: FC<{
           disabled={disabled}
           onClick={() => (single ? actions[0].onClick() : setOpen(!open))}
           className={clsx(
-            'relative min-w-[92px] h-[34px] rounded-[6px] flex justify-center items-center gap-[8px] text-[13px] font-[600] bg-btnPrimary text-white disabled:bg-btnSimple disabled:text-textItemBlur disabled:cursor-not-allowed',
+            'relative min-w-[92px] h-[34px] rounded-[6px] flex justify-center items-center gap-[8px] text-[13px] font-[600] bg-btnPrimary text-accentFg disabled:bg-btnSimple disabled:text-textItemBlur disabled:cursor-not-allowed',
             single ? 'px-[16px]' : 'ps-[24px] pe-[12px]'
           )}
         >

@@ -278,7 +278,7 @@ export const PickPlatforms: FC<{
                             (p) => p.id === integration.id
                           ) === -1
                             ? 'bg-third border border-third'
-                            : 'bg-btnPrimary border border-btnPrimary'
+                            : 'bg-btnPrimary text-accentFg border border-btnPrimary'
                         )}
                       >
                         <div className="flex items-center justify-center gap-[10px]">

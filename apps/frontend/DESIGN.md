@@ -10,7 +10,7 @@ Screens are restyled in later sprints; this document describes the token layer o
 2. **Keyboard first.** Every nav target reachable from a command palette, visible shortcut hints, a visible focus ring (`--new-focus`) on keyboard focus.
 3. **Minimal chrome.** 1px low-alpha borders, one subtle shadow, no gradients, no promo banners.
 4. **One accent.** Amber is used only for primary actions, focus and selected state. Everything else is neutral.
-5. **Semantic tokens only.** Never use raw hex in components. The legacy `customColorN` / `--color-custom*` tokens are removed.
+5. **Semantic tokens only.** Never use raw hex in components.
 
 ## Color tokens
 
@@ -49,9 +49,9 @@ Legacy aliases still defined (`--color-primary`, `--color-secondary`, `--color-t
 
 Platform preview tokens (`--linkedin-*`, `--facebook-*`, `--instagram-*`, `--tiktok-*`, `--youtube-*`) intentionally mimic each network and are not part of this system.
 
-### Known follow-up
+### Text on accent
 
-`btnPrimary` is now amber, but many existing buttons pair it with `text-white`. Use `text-accentFg` on accent backgrounds when touching those screens.
+Surfaces using `bg-btnPrimary` / `bg-accent` must use `text-accentFg` (never `text-white`), so contrast holds in both themes. Icons on these surfaces use `currentColor`.
 
 ## Typography
 
@@ -87,7 +87,7 @@ Don't:
 </div>
 ```
 
-- Don't use raw hex, `customColorN`, gradients or stacked shadows.
+- Don't use raw hex, gradients or stacked shadows.
 - Don't use the accent for decoration; at most one accent element per region.
 - Don't hide focus. Keep the `--new-focus` ring on keyboard focus.
 - Don't touch the platform preview tokens or `polonto.css`.

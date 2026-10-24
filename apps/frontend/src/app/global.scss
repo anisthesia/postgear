@@ -98,7 +98,7 @@ body * {
 }
 .swal2-confirm {
   @apply bg-btnPrimary #{!important};
-  @apply text-white #{!important};
+  @apply text-accentFg #{!important};
 }
 
 .w-md-editor-text {
@@ -176,7 +176,7 @@ body * {
 }
 
 .react-tags__tag:hover {
-  @apply text-textColor bg-btnPrimary;
+  @apply text-accentFg bg-btnPrimary;
 }
 
 .react-tags__tag::after {
@@ -259,7 +259,7 @@ body * {
 }
 
 .react-tags__listbox-option:not([aria-disabled='true']).is-active {
-  @apply text-textColor bg-btnPrimary;
+  @apply text-accentFg bg-btnPrimary;
 }
 
 .react-tags__listbox-option[aria-disabled='true'] {
@@ -864,7 +864,7 @@ html[dir='rtl'] [dir='ltr'] {
 
 .forceChange .changeColor {
   background: var(--new-btn-primary) !important;
-  color: #fff !important;
+  color: var(--new-accent-fg) !important;
 }
 
 .text-shadow-tags {
