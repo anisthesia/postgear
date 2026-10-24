@@ -57,7 +57,7 @@ export async function digestEmailWorkflow({
         user.user.email,
         toSend.length === 1
           ? toSend[0].title
-          : `[postgear] Your latest notifications`,
+          : `[Postiz] Your latest notifications`,
         toSend.map((p) => p.message).join('<br/>'),
         'bottom'
       );
