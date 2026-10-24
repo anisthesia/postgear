@@ -65,3 +65,4 @@ apps/frontend/public/g.js
 
 # postgear: local upload storage
 var/uploads/
+.claude/settings.local.json
