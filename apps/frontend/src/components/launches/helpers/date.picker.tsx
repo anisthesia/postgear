@@ -240,7 +240,7 @@ export const DatePickerPanel: FC<{
         value={toPickerDate(date)}
         dayClassName={(date, modifiers) => {
           if (modifiers.weekend) {
-            return '!text-customColor28';
+            return '!text-btnPrimary';
           }
           if (modifiers.outside) {
             return '!text-gray';

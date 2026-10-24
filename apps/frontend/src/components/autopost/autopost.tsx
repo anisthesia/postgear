@@ -71,7 +71,7 @@ export const Autopost: FC = () => {
   return (
     <div className="flex flex-col">
       <h3 className="text-[20px]">{t('autopost', 'Autopost')}</h3>
-      <div className="text-customColor18 mt-[4px]">
+      <div className="text-textItemBlur mt-[4px]">
         {t(
           'autopost_creates_drafts_from_your_rss_new_items',
           'Autopost creates drafts from your RSS new items, review and schedule them from the calendar to publish them'
@@ -285,7 +285,7 @@ export const AddOrEditWebhook: FC<{
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(callBack)}>
-        <div className="relative flex gap-[20px] flex-col flex-1 rounded-[4px] border border-customColor6 pt-0">
+        <div className="relative flex gap-[20px] flex-col flex-1 rounded-[4px] border border-fifth pt-0">
           <div>
             <Input
               label="Title"
@@ -333,7 +333,7 @@ export const AddOrEditWebhook: FC<{
                 <CopilotTextarea
                   disableBranding={true}
                   className={clsx(
-                    '!min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[#612AD5] bg-customColor2 outline-none mb-[16px] border-fifth border rounded-[4px]'
+                    '!min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[#612AD5] bg-input outline-none mb-[16px] border-fifth border rounded-[4px]'
                   )}
                   value={content}
                   onChange={(e) => {

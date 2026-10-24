@@ -95,7 +95,7 @@ export const Plugs = () => {
       </div>
       {!sortedIntegrations.length ? (
         <div className="bg-sixth border-fifth border rounded-[4px] p-[24px] flex flex-col gap-[16px] items-start">
-          <div className="text-customColor18">
+          <div className="text-textItemBlur">
             {t(
               'there_are_not_plugs_matching_your_channels',
               'There are not plugs matching your channels'

@@ -88,7 +88,7 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
                   >
                     {org?.name}
                     {!!org?.users?.[0]?.role && (
-                      <span className="text-customColor18">
+                      <span className="text-textItemBlur">
                         {' '}
                         (
                         {org?.users?.[0]?.role === 'SUPERADMIN'

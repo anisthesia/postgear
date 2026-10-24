@@ -351,7 +351,7 @@ const McpSection = ({
           <div className="text-[15px] font-[600]">
             {t('mcp_client_configuration', 'MCP Client Configuration')}
           </div>
-          <div className="text-[13px] text-customColor18 mt-[2px]">
+          <div className="text-[13px] text-textItemBlur mt-[2px]">
             {t(
               'connect_your_mcp_client_to_postiz_to_schedule_your_posts_faster',
               'Connect postgear MCP server to your client (Http streaming) to schedule your posts faster.'
@@ -392,7 +392,7 @@ const McpSection = ({
       <div className="p-[20px] mobile:p-[14px] flex flex-col gap-[16px]">
         {(tab === 'official' || !chatOnly) && (
           <div className="flex flex-col gap-[6px]">
-            <div className="text-[13px] font-[600] text-customColor18">
+            <div className="text-[13px] font-[600] text-textItemBlur">
               {t('auth_method', 'Authentication')}
             </div>
             <div className="flex flex-wrap gap-[6px]">
@@ -404,7 +404,7 @@ const McpSection = ({
                     'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors',
                     tab === m
                       ? 'bg-[#612BD3] text-white'
-                      : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
+                      : 'bg-btnSimple text-textItemBlur hover:bg-boxHover hover:text-textColor'
                   )}
                   onClick={() => setTab(m)}
                 >
@@ -420,7 +420,7 @@ const McpSection = ({
         )}
         {tab === 'official' ? (
           <div className="flex flex-col gap-[8px]">
-            <div className="text-[12px] text-customColor18 font-[500]">
+            <div className="text-[12px] text-textItemBlur font-[500]">
               {isSelfHosted
                 ? t(
                     'connector_self_hosted_description',
@@ -455,7 +455,7 @@ const McpSection = ({
         ) : (
           <>
         <div className="flex flex-col gap-[6px]">
-          <div className="text-[13px] font-[600] text-customColor18">
+          <div className="text-[13px] font-[600] text-textItemBlur">
             {t('mcp_client', 'Client')}
           </div>
           <div className="flex flex-wrap gap-[6px]">
@@ -471,7 +471,7 @@ const McpSection = ({
                   'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors flex items-center gap-[8px]',
                   activeClient === client
                     ? 'bg-[#612BD3] text-white'
-                    : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
+                    : 'bg-btnSimple text-textItemBlur hover:bg-boxHover hover:text-textColor'
                 )}
                 onClick={() =>
                   setActiveClient(client as AnyMcpClient)
@@ -484,7 +484,7 @@ const McpSection = ({
           </div>
         </div>
         <div className="flex flex-col gap-[8px]">
-          <div className="text-[12px] text-customColor18 font-[500]">
+          <div className="text-[12px] text-textItemBlur font-[500]">
             {hint}
             {auth === 'oauth' &&
               !chatOnly &&
@@ -633,7 +633,7 @@ const CliSection = ({ apiKey }: { apiKey: string }) => {
           <div className="text-[15px] font-[600]">
             {t('cli_and_skills', 'CLI & AI Skills')}
           </div>
-          <div className="text-[13px] text-customColor18 mt-[2px]">
+          <div className="text-[13px] text-textItemBlur mt-[2px]">
             {t(
               'cli_description',
               'Use the Postiz CLI to automate posting from your terminal, or install the skill to let your AI agent schedule posts for you.'
@@ -661,7 +661,7 @@ const CliSection = ({ apiKey }: { apiKey: string }) => {
                 'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors',
                 mode === m
                   ? 'bg-[#612BD3] text-white'
-                  : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
+                  : 'bg-btnSimple text-textItemBlur hover:bg-boxHover hover:text-textColor'
               )}
               onClick={() => setMode(m)}
             >
@@ -673,7 +673,7 @@ const CliSection = ({ apiKey }: { apiKey: string }) => {
         </div>
         {displaySteps.map((step, i) => (
           <div key={i} className="flex flex-col gap-[6px]">
-            <div className="text-[13px] font-[600] text-customColor18">
+            <div className="text-[13px] font-[600] text-textItemBlur">
               {i + 1}. {step.label}
             </div>
             <pre className="bg-newBgColorInner border border-newBorder rounded-[8px] p-[16px] text-[13px] whitespace-pre-wrap break-all overflow-x-auto leading-[1.6]">
@@ -789,7 +789,7 @@ const PublicApiContent = () => {
             <div className="text-[15px] font-[600]">
               {t('api_key', 'API Key')}
             </div>
-            <div className="text-[13px] text-customColor18 mt-[2px]">
+            <div className="text-[13px] text-textItemBlur mt-[2px]">
               {t(
                 'use_postiz_api_to_integrate_with_your_tools',
                 'Use postgear API to integrate with your tools.'
