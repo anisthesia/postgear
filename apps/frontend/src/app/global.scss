@@ -14,6 +14,13 @@
 body {
   background: var(--new-bgColor) !important;
   color: var(--new-btn-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+:focus-visible {
+  outline: 1px solid var(--new-focus) !important;
+  outline-offset: 1px;
 }
 
 body * {

@@ -19,6 +19,11 @@ module.exports = {
         tableBorder: 'var(--color-table-border)',
         modalCustom: 'var(--color-modalCustom)',
 
+        newSurface2: 'var(--new-surface-2)',
+        accent: 'var(--new-accent)',
+        accentFg: 'var(--new-accent-fg)',
+        focus: 'var(--new-focus)',
+
         newBgColor: 'var(--new-bgColor)',
         newBackdrop: 'var(--new-back-drop)',
         newSep: 'var(--new-sep)',
@@ -67,7 +72,27 @@ module.exports = {
         loginBg: 'url(/auth/bg-login.png)',
       },
       fontFamily: {
-        sans: ['Helvetica Neue'],
+        sans: [
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif',
+        ],
+      },
+      fontSize: {
+        caption: ['11px', { lineHeight: '1.45' }],
+        body: ['13px', { lineHeight: '1.45' }],
+        subtitle: ['15px', { lineHeight: '1.45' }],
+        title: ['20px', { lineHeight: '1.35' }],
+      },
+      borderRadius: {
+        control: '4px',
+        card: '6px',
+        panel: '8px',
       },
       animation: {
         fade: 'fadeOut 0.5s ease-in-out',
@@ -87,6 +112,7 @@ module.exports = {
         yellowToast: '0px 0px 50px rgba(252, 186, 3, 0.3)',
         greenToast: '0px 0px 50px rgba(60, 124, 90, 0.3)',
         menu: 'var(--menu-shadow)',
+        elevation: 'var(--menu-shadow)',
         previewShadow: 'var(--preview-box-shadow)',
       },
       dropShadow: {
