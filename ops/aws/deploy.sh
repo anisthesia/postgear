@@ -76,7 +76,8 @@ ENV
 else
   echo "[remote] keeping existing /opt/postgear/.env"
 fi
-docker compose pull -q
+# postiz may be a locally loaded image (ship-image.sh) that is not in any registry
+docker compose pull -q --ignore-pull-failures
 docker compose up -d
 docker compose ps --format 'table {{.Service}}\t{{.State}}\t{{.Status}}'
 REMOTE

@@ -20,7 +20,8 @@ services:
       - postiz
 
   postiz:
-    image: ghcr.io/gitroomhq/postiz-app:${POSTIZ_TAG}
+    # POSTIZ_IMAGE=postgear + POSTIZ_TAG=<sha> runs the locally shipped fork (ops/aws/ship-image.sh).
+    image: ${POSTIZ_IMAGE:-ghcr.io/gitroomhq/postiz-app}:${POSTIZ_TAG}
     restart: unless-stopped
     env_file: .env
     volumes:
