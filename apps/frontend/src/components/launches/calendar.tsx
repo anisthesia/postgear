@@ -50,6 +50,7 @@ import { StatisticsModal } from '@gitroom/frontend/components/launches/statistic
 import { MissingReleaseModal } from '@gitroom/frontend/components/launches/missing-release.modal';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import i18next from 'i18next';
+import { Board } from '@gitroom/frontend/components/queue/board';
 import { AddEditModal } from '@gitroom/frontend/components/new-launch/add.edit.modal';
 import { CreationMethodBadge } from '@gitroom/frontend/components/launches/creation.method.badge';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
@@ -167,7 +168,7 @@ const DayNowLine: FC<{ now: dayjs.Dayjs; className?: string }> = ({
 );
 
 // Shared hook for post actions (edit, delete, statistics)
-const usePostActions = (onMutate?: () => void) => {
+export const usePostActions = (onMutate?: () => void) => {
   const t = useT();
   const fetch = useFetch();
   const modal = useModals();
@@ -755,7 +756,9 @@ export const Calendar = () => {
   const { display } = useCalendar();
   return (
     <>
-      {display === 'list' ? (
+      {display === 'board' ? (
+        <Board />
+      ) : display === 'list' ? (
         <ListView />
       ) : display === 'day' ? (
         <DayView />

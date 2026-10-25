@@ -14,7 +14,7 @@ import { FilterIcon } from '@gitroom/frontend/components/ui/icons';
 
 // Helper function to get start and end dates based on display type
 function getDateRange(
-  display: 'day' | 'week' | 'month' | 'list',
+  display: 'day' | 'week' | 'month' | 'list' | 'board',
   referenceDate?: string
 ) {
   const date = referenceDate ? newDayjs(referenceDate) : newDayjs();
@@ -26,6 +26,7 @@ function getDateRange(
         endDate: date.format('YYYY-MM-DD'),
       };
     case 'week':
+    case 'board':
       return {
         startDate: date.startOf('isoWeek').format('YYYY-MM-DD'),
         endDate: date.endOf('isoWeek').format('YYYY-MM-DD'),
@@ -61,6 +62,7 @@ export const Filters = () => {
       case 'day':
         return startDate.format(short ? 'ddd (L)' : 'dddd (L)');
       case 'week':
+      case 'board':
         return `${startDate.format('L')} - ${endDate.format('L')}`;
       case 'month':
         return startDate.format('MMMM YYYY');
@@ -105,6 +107,20 @@ export const Filters = () => {
       startDate: range.startDate,
       endDate: range.endDate,
       display: 'day',
+      customer: calendar.customer,
+    });
+  }, [calendar]);
+
+  const setBoard = useCallback(() => {
+    if (calendar.display === 'board') {
+      return;
+    }
+
+    const range = getDateRange('board');
+    calendar.setFilters({
+      startDate: range.startDate,
+      endDate: range.endDate,
+      display: 'board',
       customer: calendar.customer,
     });
   }, [calendar]);
@@ -470,6 +486,15 @@ export const Filters = () => {
           isListView && 'hidden mobile:flex'
         )}
       >
+        <div
+          className={clsx(
+            'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',
+            calendar.display === 'board' && 'text-textItemFocused bg-boxFocused'
+          )}
+          onClick={setBoard}
+        >
+          {t('board', 'Board')}
+        </div>
         <div
           className={clsx(
             'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',

@@ -64,7 +64,7 @@ export const CalendarContext = createContext({
   setFilters: (filters: {
     startDate: string;
     endDate: string;
-    display: 'week' | 'month' | 'day' | 'list';
+    display: 'week' | 'month' | 'day' | 'list' | 'board';
     customer: string | null;
   }) => {
     /** empty **/
@@ -132,6 +132,7 @@ function getDateRange(display: string, referenceDate?: string) {
         endDate: date.format('YYYY-MM-DD'),
       };
     case 'week':
+    case 'board':
       return {
         startDate: date.startOf('isoWeek').format('YYYY-MM-DD'),
         endDate: date.endOf('isoWeek').format('YYYY-MM-DD'),
@@ -174,13 +175,13 @@ export const CalendarWeekProvider: FC<{
   const [internalData, setInternalData] = useState([] as any[]);
   const [trendings] = useState<string[]>([]);
   const searchParams = useSearchParams();
-  // A 7-column week doesn't fit a phone, so default small screens (tailwind `mobile`) to the day view
+  // A 7-column week doesn't fit a phone, so default small screens (tailwind `mobile`) to the day view, desktop starts on the board
   const [displaySaved, setDisplaySaved] = useCookie(
     'calendar-display',
     typeof window !== 'undefined' &&
       window.matchMedia('(max-width: 1025px)').matches
       ? 'day'
-      : 'week'
+      : 'board'
   );
   const display = searchParams.get('display') || displaySaved;
 
@@ -233,7 +234,7 @@ export const CalendarWeekProvider: FC<{
   // Calendar view data fetcher
   const loadData = useCallback(async () => {
     const modifiedParams = new URLSearchParams({
-      display: filters.display,
+      display: filters.display === 'board' ? 'week' : filters.display,
       customer: filters?.customer?.toString() || '',
       startDate: newDayjs(filters.startDate).startOf('day').utc().format(),
       endDate: newDayjs(filters.endDate).endOf('day').utc().format(),
@@ -320,7 +321,7 @@ export const CalendarWeekProvider: FC<{
     (newFilters: {
       startDate: string;
       endDate: string;
-      display: 'week' | 'month' | 'day' | 'list';
+      display: 'week' | 'month' | 'day' | 'list' | 'board';
       customer: string | null;
     }) => {
       setDisplaySaved(newFilters.display);
