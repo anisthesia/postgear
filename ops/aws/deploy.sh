@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Push the stack to the server and (re)start it. Safe to re-run.
 #   ops/aws/deploy.sh            # uses terraform output for the host
+# To run the postgear fork built by .github/workflows/postgear-image.yml, set in the
+# host's /opt/postgear/.env: POSTIZ_IMAGE=ghcr.io/anisthesia/postgear and POSTIZ_TAG=<sha>
+# (7-char commit sha), then on the host: docker compose pull postiz && docker compose up -d postiz
 # On first run it generates /opt/postgear/.env ON THE SERVER with fresh secrets;
 # later runs keep that file untouched. Provider keys are added there by hand.
 set -euo pipefail
