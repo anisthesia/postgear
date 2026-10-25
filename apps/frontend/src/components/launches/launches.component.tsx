@@ -30,6 +30,10 @@ import { useIntegrationList } from '@gitroom/frontend/components/launches/helper
 import useCookie from 'react-use-cookie';
 import { HubspotInstalled } from '@gitroom/frontend/components/launches/hubspot.installed';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
+import {
+  DesktopShellPortals,
+  useShellSlots,
+} from '@gitroom/frontend/components/shell/desktop/desktop.shell';
 import { Input } from '@gitroom/react/form/input';
 import { Button } from '@gitroom/react/form/button';
 
@@ -469,6 +473,7 @@ export const LaunchesComponent = () => {
   const [collapseMenu, setCollapseMenu] = useCookie('collapseMenu', '0');
   const [channelsOpen, setChannelsOpen] = useState(false);
   const [mode] = useCookie('mode', 'dark');
+  const shellSlots = useShellSlots();
   const { isLoading, data: integrations, mutate } = useIntegrationList();
 
   const totalNonDisabledChannels = useMemo(() => {
@@ -787,7 +792,7 @@ export const LaunchesComponent = () => {
               </div>
             )}
           </div>
-          <Filters />
+          {shellSlots ? <DesktopShellPortals slots={shellSlots} /> : <Filters />}
           <div className="flex-1 flex">
             <Calendar />
           </div>
