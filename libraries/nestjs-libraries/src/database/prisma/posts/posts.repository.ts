@@ -9,6 +9,7 @@ import {
   ReviewTarget,
   State,
 } from '@prisma/client';
+import { GetInboxDto } from '@gitroom/nestjs-libraries/dtos/posts/inbox.query.dto';
 import { GetPostsDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.dto';
 import { GetPostsListDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.list.dto';
 import dayjs from 'dayjs';
@@ -382,6 +383,181 @@ export class PostsRepository {
         id: true,
       },
     });
+  }
+
+  // One row per post group, newest first; the posts of a group are the same
+  // post on several channels so only the first channel represents it.
+  async getInbox(orgId: string, query: GetInboxDto) {
+    const take = query.limit || 20;
+    const before = query.cursor ? new Date(query.cursor) : undefined;
+
+    const postBase = {
+      organizationId: orgId,
+      deletedAt: null as Date | null,
+      parentPostId: null as string | null,
+      integration: { deletedAt: null as Date | null },
+    };
+
+    const postSelect = {
+      id: true,
+      group: true,
+      content: true,
+      publishDate: true,
+      state: true,
+      error: true,
+      updatedAt: true,
+      reviewStatus: true,
+      reviewTarget: true,
+      reviewRequestedAt: true,
+      reviewedAt: true,
+      reviewedBy: { select: { id: true, name: true } },
+      integration: {
+        select: {
+          id: true,
+          name: true,
+          picture: true,
+          providerIdentifier: true,
+        },
+      },
+    };
+
+    const sections = {
+      failed: { ...postBase, state: State.ERROR },
+      approvals: {
+        ...postBase,
+        reviewStatus: ReviewStatus.REQUESTED,
+        reviewTarget: ReviewTarget.TEAM,
+      },
+      changesRequested: {
+        ...postBase,
+        reviewStatus: ReviewStatus.CHANGES_REQUESTED,
+      },
+      waitingOnClient: {
+        ...postBase,
+        reviewTarget: ReviewTarget.CLIENT,
+        reviewStatus: {
+          in: [ReviewStatus.REQUESTED, ReviewStatus.CHANGES_REQUESTED],
+        },
+      },
+      activity: {
+        ...postBase,
+        OR: [
+          { reviewStatus: { in: Object.values(ReviewStatus) } },
+          { state: { in: [State.PUBLISHED, State.ERROR] } },
+        ],
+      },
+    };
+
+    const page = (where: any, key: 'updatedAt' | 'reviewRequestedAt') =>
+      this._post.model.post.findMany({
+        where: { ...where, ...(before ? { [key]: { lt: before } } : {}) },
+        distinct: ['group'],
+        orderBy: { [key]: 'desc' },
+        take,
+        select: postSelect,
+      });
+
+    const total = async (where: any) =>
+      (
+        await this._post.model.post.groupBy({
+          by: ['group'],
+          where,
+        })
+      ).length;
+
+    const commentsWhere = {
+      organizationId: orgId,
+      deletedAt: null as Date | null,
+      parentId: null as string | null,
+      resolvedAt: null as Date | null,
+      post: { deletedAt: null as Date | null },
+    };
+
+    const [
+      failed,
+      approvals,
+      changesRequested,
+      waitingOnClient,
+      activity,
+      comments,
+      commentsTotal,
+      counts,
+    ] = await Promise.all([
+      page(sections.failed, 'updatedAt'),
+      page(sections.approvals, 'reviewRequestedAt'),
+      page(sections.changesRequested, 'updatedAt'),
+      page(sections.waitingOnClient, 'reviewRequestedAt'),
+      page(sections.activity, 'updatedAt'),
+      this._comments.model.comments.findMany({
+        where: { ...commentsWhere, ...(before ? { createdAt: { lt: before } } : {}) },
+        orderBy: { createdAt: 'desc' },
+        take,
+        select: {
+          id: true,
+          content: true,
+          displayName: true,
+          createdAt: true,
+          user: { select: { id: true, name: true } },
+          post: {
+            select: {
+              id: true,
+              group: true,
+              content: true,
+              integration: {
+                select: {
+                  id: true,
+                  name: true,
+                  picture: true,
+                  providerIdentifier: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      this._comments.model.comments.count({ where: commentsWhere }),
+      Promise.all([
+        total(sections.failed),
+        total(sections.approvals),
+        total(sections.changesRequested),
+        total(sections.waitingOnClient),
+      ]),
+    ]);
+
+    // the author needs the reviewer's words next to a changes-requested post
+    const latestComments = changesRequested.length
+      ? await this._comments.model.comments.findMany({
+          where: {
+            organizationId: orgId,
+            deletedAt: null,
+            parentId: null,
+            resolvedAt: null,
+            postId: { in: changesRequested.map((p) => p.id) },
+          },
+          orderBy: { createdAt: 'desc' },
+          select: { postId: true, content: true },
+        })
+      : [];
+
+    return {
+      failed: failed.map((p) => ({ ...p, error: this.curatedError(p.error) })),
+      approvals,
+      changesRequested: changesRequested.map((p) => ({
+        ...p,
+        comment:
+          latestComments.find((c) => c.postId === p.id)?.content || null,
+      })),
+      waitingOnClient,
+      activity: activity.map((p) => ({ ...p, error: this.curatedError(p.error) })),
+      comments,
+      counts: {
+        failed: counts[0],
+        approvals: counts[1],
+        changesRequested: counts[2],
+        waitingOnClient: counts[3],
+        comments: commentsTotal,
+      },
+    };
   }
 
   setReviewForGroup(

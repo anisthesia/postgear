@@ -18,6 +18,7 @@ import {
   State,
 } from '@prisma/client';
 import { GetPostsDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.dto';
+import { GetInboxDto } from '@gitroom/nestjs-libraries/dtos/posts/inbox.query.dto';
 import { GetPostsListDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.list.dto';
 import { groupBy, shuffle, uniqBy } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
@@ -1733,6 +1734,10 @@ export class PostsService {
       commentId,
       resolved ? new Date() : null
     );
+  }
+
+  getInbox(orgId: string, query: GetInboxDto) {
+    return this._postRepository.getInbox(orgId, query);
   }
 
   async requestReview(orgId: string, group: string, target: ReviewTarget) {

@@ -15,6 +15,7 @@ import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.reque
 import { Organization, User } from '@prisma/client';
 import { GetPostsDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.dto';
 import { GetPostsListDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.list.dto';
+import { GetInboxDto } from '@gitroom/nestjs-libraries/dtos/posts/inbox.query.dto';
 import { CheckPolicies } from '@gitroom/backend/services/auth/permissions/permissions.ability';
 import { ApiTags } from '@nestjs/swagger';
 import { GeneratorDto } from '@gitroom/nestjs-libraries/dtos/generator/generator.dto';
@@ -189,6 +190,14 @@ export class PostsController {
     @Param('id') id?: string
   ) {
     return { date: await this._postsService.findFreeDateTime(org.id, id) };
+  }
+
+  @Get('/inbox')
+  async getInbox(
+    @GetOrgFromRequest() org: Organization,
+    @Query() query: GetInboxDto
+  ) {
+    return this._postsService.getInbox(org.id, query);
   }
 
   @Get('/list')
