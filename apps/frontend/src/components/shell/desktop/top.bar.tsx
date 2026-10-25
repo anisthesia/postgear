@@ -3,7 +3,7 @@
 import { FC } from 'react';
 import dynamic from 'next/dynamic';
 import { Filters } from '@gitroom/frontend/components/launches/filters';
-import { NewPost } from '@gitroom/frontend/components/launches/new.post';
+import { openCompose } from '@gitroom/frontend/components/compose/use.compose';
 import NotificationComponent from '@gitroom/frontend/components/notifications/notification.component';
 import { LanguageComponent } from '@gitroom/frontend/components/layout/language.component';
 import { ChromeExtensionComponent } from '@gitroom/frontend/components/layout/chrome.extension.component';
@@ -18,13 +18,27 @@ const ModeComponent = dynamic(
 
 export const TOPBAR_SLOT_ID = 'shell-topbar-slot';
 export const ATTENTION_SLOT_ID = 'shell-attention-slot';
+export const COMPOSE_SLOT_ID = 'shell-compose-slot';
+
+const NewPostButton: FC = () => {
+  const t = useT();
+  return (
+    <button
+      onClick={openCompose}
+      className="text-accentFg pt-[12px] pb-[14px] ps-[16px] pe-[20px] min-h-[44px] max-h-[44px] rounded-md bg-btnPrimary flex justify-center items-center gap-[5px] outline-none text-[14px]"
+    >
+      <span className="text-[18px] leading-none">+</span>
+      {t('create_new_post', 'Create Post')}
+    </button>
+  );
+};
 
 // What the calendar page portals into the top bar: it needs the calendar context
 export const TopBarToolbar: FC = () => (
   <>
     <Filters />
     <div data-shell-new-post="" className="flex">
-      <NewPost />
+      <NewPostButton />
     </div>
   </>
 );

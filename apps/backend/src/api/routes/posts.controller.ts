@@ -15,6 +15,7 @@ import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.reque
 import { Organization, User } from '@prisma/client';
 import { GetPostsDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.dto';
 import { GetPostsListDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.list.dto';
+import { GetInboxDto } from '@gitroom/nestjs-libraries/dtos/posts/inbox.query.dto';
 import { CheckPolicies } from '@gitroom/backend/services/auth/permissions/permissions.ability';
 import { ApiTags } from '@nestjs/swagger';
 import { GeneratorDto } from '@gitroom/nestjs-libraries/dtos/generator/generator.dto';
@@ -33,6 +34,10 @@ import {
   CreatePublicCommentDto,
   ResolveCommentDto,
 } from '@gitroom/nestjs-libraries/dtos/comments/add.comment.dto';
+import {
+  RequestChangesDto,
+  RequestReviewDto,
+} from '@gitroom/nestjs-libraries/dtos/posts/review.post.dto';
 import { RealIP } from 'nestjs-real-ip';
 
 @ApiTags('Posts')
@@ -101,6 +106,41 @@ export class PostsController {
     return this._postsService.resolveComment(org.id, commentId, body.resolved);
   }
 
+  @Post('/:group/review/request')
+  async requestReview(
+    @GetOrgFromRequest() org: Organization,
+    @Param('group') group: string,
+    @Body() body: RequestReviewDto
+  ) {
+    return this._postsService.requestReview(org.id, group, body.target);
+  }
+
+  @Post('/:group/review/approve')
+  async approveReview(
+    @GetOrgFromRequest() org: Organization,
+    @GetUserFromRequest() user: User,
+    @Param('group') group: string
+  ) {
+    return this._postsService.approveReview(org.id, user.id, group);
+  }
+
+  @Post('/:group/review/request-changes')
+  async requestChanges(
+    @GetOrgFromRequest() org: Organization,
+    @GetUserFromRequest() user: User,
+    @Param('group') group: string,
+    @Body() body: RequestChangesDto,
+    @RealIP() ip: string
+  ) {
+    return this._postsService.requestChanges(
+      org.id,
+      user.id,
+      group,
+      body.comment,
+      ip
+    );
+  }
+
   @Get('/tags')
   async getTags(@GetOrgFromRequest() org: Organization) {
     return { tags: await this._postsService.getTags(org.id) };
@@ -150,6 +190,14 @@ export class PostsController {
     @Param('id') id?: string
   ) {
     return { date: await this._postsService.findFreeDateTime(org.id, id) };
+  }
+
+  @Get('/inbox')
+  async getInbox(
+    @GetOrgFromRequest() org: Organization,
+    @Query() query: GetInboxDto
+  ) {
+    return this._postsService.getInbox(org.id, query);
   }
 
   @Get('/list')

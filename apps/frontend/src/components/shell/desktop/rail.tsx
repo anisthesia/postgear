@@ -8,6 +8,7 @@ import { Logo } from '@gitroom/frontend/components/new-layout/logo';
 import { OrganizationSelector } from '@gitroom/frontend/components/layout/organization.selector';
 import { useMenuItem } from '@gitroom/frontend/components/layout/top.menu';
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
+import { useInbox } from '@gitroom/frontend/components/inbox/use.inbox';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 interface RailEntry {
@@ -15,14 +16,9 @@ interface RailEntry {
   hint: string;
   path: string;
   icon: ReactNode;
-  onClick?: () => void;
+  badge?: number;
   children?: { label: string; path: string }[];
 }
-
-const openInbox = () =>
-  document
-    .querySelector<HTMLElement>('[data-shell-inbox] .cursor-pointer')
-    ?.click();
 
 const Icon: FC<{ children: ReactNode }> = ({ children }) => (
   <div className="w-[20px] h-[20px] flex items-center justify-center shrink-0 [&>svg]:max-w-[18px] [&>svg]:max-h-[18px]">
@@ -37,6 +33,10 @@ export const Rail: FC = () => {
   const user = useUser();
   const pathname = usePathname();
   const { all } = useMenuItem();
+  const { data: inbox } = useInbox(1);
+  const needsMe = inbox
+    ? inbox.counts.failed + inbox.counts.approvals + inbox.counts.changesRequested
+    : 0;
   const icon = (path: string) => all.find((i) => i.path === path)?.icon;
 
   const entries: RailEntry[] = [
@@ -44,8 +44,8 @@ export const Rail: FC = () => {
     {
       label: t('inbox', 'Inbox'),
       hint: 'G I',
-      path: '',
-      onClick: openInbox,
+      path: '/inbox',
+      badge: needsMe,
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path
@@ -104,6 +104,11 @@ export const Rail: FC = () => {
               <>
                 <Icon>{entry.icon}</Icon>
                 <span className="flex-1 text-start">{entry.label}</span>
+                {!!entry.badge && (
+                  <span className="min-w-[18px] h-[18px] px-[5px] rounded-full bg-btnPrimary text-white text-[11px] font-[600] flex items-center justify-center">
+                    {entry.badge}
+                  </span>
+                )}
                 <kbd className="text-[10px] text-textItemBlur/70 font-sans">
                   {entry.hint}
                 </kbd>
@@ -111,15 +116,9 @@ export const Rail: FC = () => {
             );
             return (
               <div key={entry.label} className="flex flex-col">
-                {entry.onClick ? (
-                  <button onClick={entry.onClick} className={className}>
-                    {inner}
-                  </button>
-                ) : (
-                  <Link prefetch={true} href={entry.path} className={className}>
-                    {inner}
-                  </Link>
-                )}
+                <Link prefetch={true} href={entry.path} className={className}>
+                  {inner}
+                </Link>
                 {active &&
                   entry.children?.map((child) => (
                     <Link

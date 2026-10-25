@@ -525,7 +525,7 @@ export class MediaService {
       'ai_videos'
     );
 
-    if (totalCredits.credits <= 0) {
+    if (process.env.STRIPE_PUBLISHABLE_KEY && totalCredits.credits <= 0) {
       throw new SubscriptionException({
         action: AuthorizationActions.Create,
         section: Sections.VIDEOS_PER_MONTH,

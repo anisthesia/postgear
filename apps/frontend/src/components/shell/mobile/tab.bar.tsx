@@ -3,8 +3,9 @@
 import { FC, ReactNode } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
+import { openCompose } from '@gitroom/frontend/components/compose/use.compose';
 
 interface Tab {
   label: string;
@@ -14,11 +15,6 @@ interface Tab {
   center?: boolean;
   icon: ReactNode;
 }
-
-const openInbox = () =>
-  document
-    .querySelector<HTMLElement>('[data-shell-inbox] .cursor-pointer')
-    ?.click();
 
 const Svg: FC<{ d: string }> = ({ d }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -34,6 +30,7 @@ const Svg: FC<{ d: string }> = ({ d }) => (
 
 export const TabBar: FC = () => {
   const t = useT();
+  const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();
   const onLaunches = pathname.startsWith('/launches');
@@ -54,13 +51,20 @@ export const TabBar: FC = () => {
     },
     {
       label: t('new', 'New'),
-      href: '/launches?new=1',
+      onClick: () => {
+        openCompose();
+        // the sheet lives in Today
+        if (!onLaunches || inQueue) {
+          router.push('/launches');
+        }
+      },
       center: true,
       icon: <Svg d="M12 5v14M5 12h14" />,
     },
     {
       label: t('inbox', 'Inbox'),
-      onClick: openInbox,
+      href: '/inbox',
+      active: pathname.startsWith('/inbox'),
       icon: (
         <Svg d="M4 13V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7m-16 0v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5m-16 0h4l1 2h6l1-2h4" />
       ),
