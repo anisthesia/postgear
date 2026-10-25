@@ -14,6 +14,7 @@ import {
   Media,
   From,
   CreationMethod,
+  ReviewTarget,
   State,
 } from '@prisma/client';
 import { GetPostsDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.dto';
@@ -1732,6 +1733,62 @@ export class PostsService {
       commentId,
       resolved ? new Date() : null
     );
+  }
+
+  async requestReview(orgId: string, group: string, target: ReviewTarget) {
+    return this.applyReview(orgId, group, {
+      reviewStatus: 'REQUESTED',
+      reviewTarget: target,
+      reviewRequestedAt: new Date(),
+      reviewedAt: null,
+      reviewedById: null,
+    });
+  }
+
+  async approveReview(orgId: string, userId: string, group: string) {
+    return this.applyReview(orgId, group, {
+      reviewStatus: 'APPROVED',
+      reviewedAt: new Date(),
+      reviewedById: userId,
+    });
+  }
+
+  async requestChanges(
+    orgId: string,
+    userId: string,
+    group: string,
+    comment: string,
+    ip: string
+  ) {
+    const root = await this._postRepository.getGroupRootPost(orgId, group);
+    if (!root) {
+      throw new NotFoundException('Post not found');
+    }
+
+    await this.createPublicComment(root.id, { content: comment }, userId, ip);
+
+    return this.applyReview(orgId, group, {
+      reviewStatus: 'CHANGES_REQUESTED',
+      reviewedAt: new Date(),
+      reviewedById: userId,
+    });
+  }
+
+  private async applyReview(
+    orgId: string,
+    group: string,
+    data: Parameters<PostsRepository['setReviewForGroup']>[2]
+  ) {
+    const { count } = await this._postRepository.setReviewForGroup(
+      orgId,
+      group,
+      data
+    );
+    if (!count) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return { group, reviewStatus: data.reviewStatus };
   }
 
   // A comment anchored to a span of text keeps its quote but loses the

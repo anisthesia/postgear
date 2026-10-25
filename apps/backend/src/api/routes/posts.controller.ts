@@ -33,6 +33,10 @@ import {
   CreatePublicCommentDto,
   ResolveCommentDto,
 } from '@gitroom/nestjs-libraries/dtos/comments/add.comment.dto';
+import {
+  RequestChangesDto,
+  RequestReviewDto,
+} from '@gitroom/nestjs-libraries/dtos/posts/review.post.dto';
 import { RealIP } from 'nestjs-real-ip';
 
 @ApiTags('Posts')
@@ -99,6 +103,41 @@ export class PostsController {
     @Body() body: ResolveCommentDto
   ) {
     return this._postsService.resolveComment(org.id, commentId, body.resolved);
+  }
+
+  @Post('/:group/review/request')
+  async requestReview(
+    @GetOrgFromRequest() org: Organization,
+    @Param('group') group: string,
+    @Body() body: RequestReviewDto
+  ) {
+    return this._postsService.requestReview(org.id, group, body.target);
+  }
+
+  @Post('/:group/review/approve')
+  async approveReview(
+    @GetOrgFromRequest() org: Organization,
+    @GetUserFromRequest() user: User,
+    @Param('group') group: string
+  ) {
+    return this._postsService.approveReview(org.id, user.id, group);
+  }
+
+  @Post('/:group/review/request-changes')
+  async requestChanges(
+    @GetOrgFromRequest() org: Organization,
+    @GetUserFromRequest() user: User,
+    @Param('group') group: string,
+    @Body() body: RequestChangesDto,
+    @RealIP() ip: string
+  ) {
+    return this._postsService.requestChanges(
+      org.id,
+      user.id,
+      group,
+      body.comment,
+      ip
+    );
   }
 
   @Get('/tags')

@@ -105,6 +105,7 @@ model User {
   agent                 String?
   deletedAt             DateTime?
   comments              Comments[]
+  reviewedPosts         Post[]               @relation("postReviewedBy")
   items                 ItemUser[]
   groupBuyer            MessagesGroup[]      @relation("groupBuyer")
   groupSeller           MessagesGroup[]      @relation("groupSeller")
@@ -479,6 +480,11 @@ model Post {
   lastMessageId              String?
   intervalInDays             Int?
   error                      String?
+  reviewStatus               ReviewStatus?
+  reviewTarget               ReviewTarget?
+  reviewRequestedAt          DateTime?
+  reviewedAt                 DateTime?
+  reviewedById               String?
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
   deletedAt                  DateTime?
@@ -493,8 +499,11 @@ model Post {
   submittedForOrder          Orders?                   @relation(fields: [submittedForOrderId], references: [id])
   submittedForOrganization   Organization?             @relation("submittedForOrg", fields: [submittedForOrganizationId], references: [id])
   tags                       TagsPosts[]
+  reviewedBy                 User?                     @relation("postReviewedBy", fields: [reviewedById], references: [id])
 
   @@index([group])
+  @@index([reviewStatus])
+  @@index([reviewedById])
   @@index([batchId])
   @@index([deletedAt])
   @@index([publishDate])
@@ -1768,6 +1777,17 @@ enum OrderStatus {
 enum From {
   BUYER
   SELLER
+}
+
+enum ReviewStatus {
+  REQUESTED
+  CHANGES_REQUESTED
+  APPROVED
+}
+
+enum ReviewTarget {
+  TEAM
+  CLIENT
 }
 
 enum State {

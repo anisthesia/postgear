@@ -5,6 +5,8 @@ import {
   APPROVED_SUBMIT_FOR_ORDER,
   CreationMethod,
   Post,
+  ReviewStatus,
+  ReviewTarget,
   State,
 } from '@prisma/client';
 import { GetPostsDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.dto';
@@ -375,6 +377,41 @@ export class PostsRepository {
         organizationId: orgId,
         group,
         parentPostId: null,
+      },
+      select: {
+        id: true,
+      },
+    });
+  }
+
+  setReviewForGroup(
+    orgId: string,
+    group: string,
+    data: {
+      reviewStatus: ReviewStatus;
+      reviewTarget?: ReviewTarget;
+      reviewRequestedAt?: Date;
+      reviewedAt?: Date | null;
+      reviewedById?: string | null;
+    }
+  ) {
+    return this._post.model.post.updateMany({
+      where: {
+        organizationId: orgId,
+        group,
+        deletedAt: null,
+      },
+      data,
+    });
+  }
+
+  getGroupRootPost(orgId: string, group: string) {
+    return this._post.model.post.findFirst({
+      where: {
+        organizationId: orgId,
+        group,
+        parentPostId: null,
+        deletedAt: null,
       },
       select: {
         id: true,
