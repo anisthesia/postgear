@@ -9,9 +9,10 @@ export const ComposeChannels: FC<{
   available: Integrations[];
   channels: string[];
   counts: Record<string, { used: number; max?: number }>;
+  issues: Record<string, string>;
   onToggle: (id: string) => void;
   onSaveDefault: () => void;
-}> = ({ available, channels, counts, onToggle, onSaveDefault }) => {
+}> = ({ available, channels, counts, issues, onToggle, onSaveDefault }) => {
   const t = useT();
   return (
     <div className="flex flex-col gap-[8px]">
@@ -57,6 +58,13 @@ export const ComposeChannels: FC<{
           );
         })}
       </div>
+      {channels.map((id) =>
+        issues[id] ? (
+          <div key={id} className="text-[12px] text-red-400">
+            {issues[id]}
+          </div>
+        ) : null
+      )}
     </div>
   );
 };

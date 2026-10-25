@@ -5,7 +5,9 @@ import React, {
   Fragment,
   memo,
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -540,8 +542,8 @@ export const WeekView = () => {
   }, [i18next.resolvedLanguage, startDate]);
 
   return (
-    <div className="flex flex-col text-textColor flex-1">
-      <div className="flex-1 relative">
+    <div className="flex flex-col text-textColor flex-1 min-w-0">
+      <div className="flex-1 relative min-w-0">
         <div className="grid [grid-template-columns:136px_repeat(7,_minmax(0,_1fr))] tablet:[grid-template-columns:72px_repeat(7,_minmax(100px,_1fr))] gap-[4px] rounded-[10px] absolute h-full start-0 top-0 w-full overflow-auto scrollbar scrollbar-thumb-fifth scrollbar-track-newBgColor">
           <div className="z-10 bg-newTableHeader flex justify-center items-center flex-col h-[62px] rounded-[8px] sticky top-0"></div>
           {localizedDays.map((day, index) => (
@@ -641,11 +643,17 @@ export const MonthView = () => {
     return calendarDays;
   }, [startDate]);
 
+  // a new month starts at its first week, not wherever the last one was scrolled
+  const gridRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    gridRef.current?.scrollTo({ top: 0 });
+  }, [startDate]);
+
   return (
-    <div className="flex flex-col text-textColor flex-1">
-      <div className="flex-1 flex relative">
+    <div className="flex flex-col text-textColor flex-1 min-w-0">
+      <div className="flex-1 flex relative min-w-0">
         {/* on phones the whole month fits the width, posts show as channel avatars */}
-        <div className="grid grid-cols-7 tablet:[grid-template-columns:repeat(7,_minmax(100px,_1fr))] mobile:!grid-cols-7 grid-rows-[62px_auto] mobile:grid-rows-[36px_auto] gap-[4px] mobile:gap-[2px] rounded-[10px] absolute start-0 top-0 overflow-auto w-full h-full scrollbar scrollbar-thumb-tableBorder scrollbar-track-secondary">
+        <div ref={gridRef} className="grid grid-cols-7 tablet:[grid-template-columns:repeat(7,_minmax(100px,_1fr))] mobile:!grid-cols-7 grid-rows-[62px_auto] mobile:grid-rows-[36px_auto] gap-[4px] mobile:gap-[2px] rounded-[10px] absolute start-0 top-0 overflow-auto w-full h-full scrollbar scrollbar-thumb-tableBorder scrollbar-track-secondary">
           {localizedDays.map((day) => (
             <div
               key={day.name}
