@@ -102,6 +102,13 @@ export const QuickPostSheet: FC = () => {
             </button>
           ))}
         </div>
+        {compose.channels.map((id) =>
+          compose.issues[id] ? (
+            <div key={id} className="text-[13px] text-red-400">
+              {compose.issues[id]}
+            </div>
+          ) : null
+        )}
         <div className="grid grid-cols-2 gap-[8px]">
           <button
             className={chip(!now && compose.when.kind === 'slot')}
@@ -129,7 +136,7 @@ export const QuickPostSheet: FC = () => {
         </div>
         <button
           onClick={submit}
-          disabled={compose.loading}
+          disabled={compose.loading || Object.keys(compose.issues).length > 0}
           className="h-[48px] w-full rounded-[8px] bg-btnPrimary text-white text-[15px] font-[600] disabled:opacity-50"
         >
           {now

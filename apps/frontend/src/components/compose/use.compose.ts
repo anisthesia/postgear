@@ -83,6 +83,7 @@ export const useCompose = (
   const { text, media, channels, when } = state;
   const [loading, setLoading] = useState(false);
   const [limits, setLimits] = useState<Record<string, number>>({});
+  const [issues, setIssues] = useState<Record<string, string>>({});
 
   const available = integrations.filter(
     (i) => !i.disabled && !i.refreshNeeded
@@ -102,6 +103,7 @@ export const useCompose = (
   }, [integrations]);
 
   const selected = available.filter((i) => channels.includes(i.id));
+  const channelKey = channels.join(',');
 
   const toggleChannel = (id: string) => {
     state.setChannels(
@@ -144,6 +146,32 @@ export const useCompose = (
     return dayjs.utc(date);
   };
 
+  // the first blocking problem the server reports for a channel, same checks the editor runs
+  const issueOf = (item: any): string | undefined => {
+    if (item.emptyContent) {
+      return t(
+        'post_needs_content_or_image',
+        'Your post should have at least one character or one image.'
+      );
+    }
+    if (item.valid === false) {
+      return (
+        item.settingsError ||
+        t(
+          'compose_needs_settings',
+          'This channel needs extra settings, open the full editor'
+        )
+      );
+    }
+    if (item.errors !== true) {
+      return item.errors;
+    }
+    if (item.tooLong) {
+      return t('post_is_too_long', 'post is too long, please fix it');
+    }
+    return undefined;
+  };
+
   // the server knows each provider's limit, the same call the editor makes before saving
   useEffect(() => {
     if (!selected.length) {
@@ -165,9 +193,20 @@ export const useCompose = (
       setLimits(
         Object.fromEntries(result.map((r) => [r.id, r.maximumCharacters]))
       );
+      // an untouched panel is not an error yet
+      setIssues(
+        hasDraft({ text, media })
+          ? Object.fromEntries(
+              result.flatMap((r: any) => {
+                const issue = issueOf(r);
+                return issue ? [[r.id, `${r.name}: ${issue}`]] : [];
+              })
+            )
+          : {}
+      );
     }, 500);
     return () => clearTimeout(handle);
-  }, [selected, text, media]);
+  }, [channelKey, integrations, text, media]);
 
   const stripped = stripHtmlValidation('normal', textToHtml(text), true);
   const counts = Object.fromEntries(
@@ -210,36 +249,9 @@ export const useCompose = (
         return failed();
       }
       for (const item of await validResponse.json()) {
-        const name = `${item.name}:`;
-        if (item.emptyContent) {
-          return failed(
-            `${name} ${t(
-              'post_needs_content_or_image',
-              'Your post should have at least one character or one image.'
-            )}`
-          );
-        }
-        if (item.valid === false) {
-          return failed(
-            `${name} ${
-              item.settingsError ||
-              t(
-                'compose_needs_settings',
-                'This channel needs extra settings, open the full editor'
-              )
-            }`
-          );
-        }
-        if (item.errors !== true) {
-          return failed(`${name} ${item.errors}`);
-        }
-        if (item.tooLong) {
-          return failed(
-            `${item.name} ${t(
-              'post_is_too_long',
-              'post is too long, please fix it'
-            )}`
-          );
+        const issue = issueOf(item);
+        if (issue) {
+          return failed(`${item.name}: ${issue}`);
         }
       }
     }
@@ -286,6 +298,9 @@ export const useCompose = (
     available,
     selected,
     counts,
+    issues: Object.fromEntries(
+      Object.entries(issues).filter(([id]) => channels.includes(id))
+    ),
     toggleChannel,
     saveDefaultChannels,
     resolveDate,

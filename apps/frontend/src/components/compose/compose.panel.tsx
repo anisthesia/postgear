@@ -136,6 +136,7 @@ export const ComposePanel: FC = () => {
           available={compose.available}
           channels={compose.channels}
           counts={compose.counts}
+          issues={compose.issues}
           onToggle={compose.toggleChannel}
           onSaveDefault={compose.saveDefaultChannels}
         />
@@ -155,7 +156,11 @@ export const ComposePanel: FC = () => {
         >
           {t('compose_open_full_editor', 'Open full editor')}
         </button>
-        <ComposeFooter loading={compose.loading} onSubmit={compose.submit} />
+        <ComposeFooter
+          loading={compose.loading}
+          blocked={Object.keys(compose.issues).length > 0}
+          onSubmit={compose.submit}
+        />
       </div>
     </div>
   );

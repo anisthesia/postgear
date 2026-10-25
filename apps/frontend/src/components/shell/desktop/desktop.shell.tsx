@@ -139,7 +139,8 @@ export const DesktopShell: FC<{ children: ReactNode }> = ({ children }) => {
                 <TopBar />
                 <div id={ATTENTION_SLOT_ID} className="flex flex-col empty:hidden" />
                 <div className={clsx('flex flex-1 min-w-0 gap-[1px]')}>
-                  {children}
+                  {/* min-w-0 lets the page shrink when the compose panel opens */}
+                  <div className="flex flex-1 min-w-0">{children}</div>
                   <div id={COMPOSE_SLOT_ID} className="flex empty:hidden" />
                 </div>
               </div>

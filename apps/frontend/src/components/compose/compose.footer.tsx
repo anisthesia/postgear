@@ -6,8 +6,9 @@ import { ComposeSaveType } from '@gitroom/frontend/components/compose/use.compos
 
 export const ComposeFooter: FC<{
   loading: boolean;
+  blocked: boolean;
   onSubmit: (type: ComposeSaveType, review?: 'TEAM' | 'CLIENT') => void;
-}> = ({ loading, onSubmit }) => {
+}> = ({ loading, blocked, onSubmit }) => {
   const t = useT();
   const [more, setMore] = useState(false);
   return (
@@ -20,7 +21,7 @@ export const ComposeFooter: FC<{
         {t('save_draft', 'Save draft')}
       </button>
       <button
-        disabled={loading}
+        disabled={loading || blocked}
         onClick={() => onSubmit('schedule')}
         className="flex-1 h-[40px] px-[16px] rounded-[8px] bg-btnPrimary text-accentFg text-[14px] disabled:opacity-50 flex items-center justify-center gap-[8px]"
       >
