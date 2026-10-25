@@ -174,9 +174,12 @@ export const useCompose = (
 
   // the server knows each provider's limit, the same call the editor makes before saving
   useEffect(() => {
-    if (!selected.length) {
+    // both the panel and the sheet render nothing while closed
+    if (!selected.length || !state.open) {
       return;
     }
+    // a superseded or unmounted run must not overwrite newer limits and issues
+    let cancelled = false;
     const handle = setTimeout(async () => {
       const response = await fetch('/posts/valid', {
         method: 'POST',
@@ -185,11 +188,14 @@ export const useCompose = (
           posts: buildPosts().map((p) => ({ ...p, group: 'compose' })),
         }),
       });
-      if (!response.ok) {
+      if (cancelled || !response.ok) {
         return;
       }
       const result: { id: string; maximumCharacters: number }[] =
         await response.json();
+      if (cancelled) {
+        return;
+      }
       setLimits(
         Object.fromEntries(result.map((r) => [r.id, r.maximumCharacters]))
       );
@@ -205,8 +211,11 @@ export const useCompose = (
           : {}
       );
     }, 500);
-    return () => clearTimeout(handle);
-  }, [channelKey, integrations, text, media]);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+  }, [channelKey, integrations, text, media, state.open]);
 
   const stripped = stripHtmlValidation('normal', textToHtml(text), true);
   const counts = Object.fromEntries(
