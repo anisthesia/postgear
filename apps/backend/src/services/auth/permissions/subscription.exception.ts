@@ -20,7 +20,6 @@ export class SubscriptionExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       statusCode: status,
       message,
-      url: process.env.FRONTEND_URL + '/billing',
     });
   }
 }
@@ -33,27 +32,27 @@ const getErrorMessage = (error: {
     case Sections.POSTS_PER_MONTH:
       switch (error.action) {
         default:
-          return 'You have reached the maximum number of posts for your subscription. Please upgrade your subscription to add more posts.';
+          return 'Your workspace has reached its limit for posts. Please contact your administrator.';
       }
     case Sections.CHANNEL:
       switch (error.action) {
         default:
-          return 'You have reached the maximum number of channels for your subscription. Please upgrade your subscription to add more channels.';
+          return 'Your workspace has reached its limit for channels. Please contact your administrator.';
       }
     case Sections.WEBHOOKS:
       switch (error.action) {
         default:
-          return 'You have reached the maximum number of webhooks for your subscription. Please upgrade your subscription to add more webhooks.';
+          return 'Your workspace has reached its limit for webhooks. Please contact your administrator.';
       }
     case Sections.VIDEOS_PER_MONTH:
       switch (error.action) {
         default:
-          return 'You have reached the maximum number of generated videos for your subscription. Please upgrade your subscription to generate more videos.';
+          return 'Your workspace has reached its limit for generated videos. Please contact your administrator.';
       }
     case Sections.CLIPPING_MINUTES:
       switch (error.action) {
         default:
-          return 'You have used all the clipping minutes of your subscription for this month. Please upgrade your subscription to clip more videos.';
+          return 'Your workspace has used all of its clipping minutes for this month. Please contact your administrator.';
       }
   }
 };
