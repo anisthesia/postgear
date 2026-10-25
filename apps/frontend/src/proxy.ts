@@ -10,6 +10,9 @@ import {
 } from '@gitroom/react/translation/i18n.config';
 acceptLanguage.languages(languages);
 
+const deviceCookieName = 'pg-device';
+const devices = ['desktop', 'mobile'];
+
 // This function can be marked `async` if using `await` inside
 export async function proxy(request: NextRequest) {
   const nextUrl = request.nextUrl;
@@ -24,6 +27,25 @@ export async function proxy(request: NextRequest) {
           request.headers.get('accept-language')
       );
 
+  // an explicit ?device= wins and is persisted, an existing cookie is never overridden
+  const deviceParam = nextUrl.searchParams.get('device');
+  const deviceCookie = request.cookies.get(deviceCookieName)?.value;
+  const device =
+    deviceParam && devices.includes(deviceParam)
+      ? deviceParam
+      : deviceCookie && devices.includes(deviceCookie)
+      ? deviceCookie
+      : /Android|iPhone|iPad|Mobile/i.test(
+          request.headers.get('user-agent') || ''
+        )
+      ? 'mobile'
+      : 'desktop';
+  const setDeviceCookie = device !== deviceCookie;
+  if (setDeviceCookie) {
+    // make the value visible to server components in this same request
+    request.cookies.set(deviceCookieName, device);
+  }
+
   const requestHeaders = new Headers(request.headers);
   if (lng) {
     requestHeaders.set(headerName, lng);
@@ -37,6 +59,14 @@ export async function proxy(request: NextRequest) {
 
   if (lng) {
     topResponse.headers.set(cookieName, lng);
+  }
+
+  if (setDeviceCookie) {
+    topResponse.cookies.set(deviceCookieName, device, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    });
   }
 
   if (nextUrl.pathname.startsWith('/modal/') && !authCookie) {
