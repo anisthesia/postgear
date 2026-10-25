@@ -3,8 +3,9 @@
 import { FC, ReactNode } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
+import { openCompose } from '@gitroom/frontend/components/compose/use.compose';
 
 interface Tab {
   label: string;
@@ -34,6 +35,7 @@ const Svg: FC<{ d: string }> = ({ d }) => (
 
 export const TabBar: FC = () => {
   const t = useT();
+  const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();
   const onLaunches = pathname.startsWith('/launches');
@@ -54,7 +56,13 @@ export const TabBar: FC = () => {
     },
     {
       label: t('new', 'New'),
-      href: '/launches?new=1',
+      onClick: () => {
+        openCompose();
+        // the sheet lives in Today
+        if (!onLaunches || inQueue) {
+          router.push('/launches');
+        }
+      },
       center: true,
       icon: <Svg d="M12 5v14M5 12h14" />,
     },

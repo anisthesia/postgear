@@ -1,7 +1,6 @@
 'use client';
 
 import { FC, useEffect, useMemo, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import {
   CalendarWeekProvider,
   useCalendar,
@@ -9,7 +8,7 @@ import {
 import { usePostActions } from '@gitroom/frontend/components/launches/calendar';
 import { useIntegrationList } from '@gitroom/frontend/components/launches/helpers/use.integration.list';
 import { DNDProvider } from '@gitroom/frontend/components/launches/helpers/dnd.provider';
-import { NewPost } from '@gitroom/frontend/components/launches/new.post';
+import { QuickPostSheet } from '@gitroom/frontend/components/compose/quick.post.sheet';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
 import { AgendaItem } from '@gitroom/frontend/components/shell/mobile/agenda.item';
@@ -18,9 +17,6 @@ import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 const TodayContent: FC = () => {
   const t = useT();
-  const router = useRouter();
-  const search = useSearchParams();
-  const newPost = useRef<HTMLDivElement>(null);
   const { posts, postDates, loading, endDate, customer, setFilters } =
     useCalendar();
   const { editPost } = usePostActions();
@@ -37,14 +33,6 @@ const TodayContent: FC = () => {
       });
     }
   }, []);
-
-  // the New tab lands here with ?new=1 and opens the existing new post flow
-  useEffect(() => {
-    if (search.get('new') && !loading) {
-      newPost.current?.querySelector('button')?.click();
-      router.replace('/launches');
-    }
-  }, [search, loading]);
 
   const { failed, drafts, parts, tomorrow } = useMemo(() => {
     const now = newDayjs();
@@ -80,9 +68,7 @@ const TodayContent: FC = () => {
 
   return (
     <div className="flex flex-col gap-[16px] p-[12px]">
-      <div ref={newPost} className="hidden">
-        <NewPost />
-      </div>
+      <QuickPostSheet />
       <AttentionCards
         failed={failed}
         drafts={drafts}
