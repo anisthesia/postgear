@@ -22,6 +22,7 @@ export const BoardColumn: FC<{
   const t = useT();
   return (
     <div
+      {...(today && { 'data-board-today': '' })}
       className={clsx(
         'flex flex-col gap-[6px] min-w-0 p-[8px] bg-newBgColorInner',
         today && 'bg-boxFocused'

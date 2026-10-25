@@ -34,6 +34,7 @@ import {
   DesktopShellPortals,
   useShellSlots,
 } from '@gitroom/frontend/components/shell/desktop/desktop.shell';
+import { useRefreshChannel } from '@gitroom/frontend/components/shell/desktop/channels.list';
 import { Input } from '@gitroom/react/form/input';
 import { Button } from '@gitroom/react/form/button';
 
@@ -550,47 +551,7 @@ export const LaunchesComponent = () => {
     },
     []
   );
-  const refreshChannel = useCallback(
-    (
-        integration: Integration & {
-          identifier: string;
-          isCustomFields?: boolean;
-          customFields?: any[];
-        }
-      ) =>
-      async () => {
-        // Custom-fields providers (Bluesky, etc.) have no OAuth URL to redirect
-        // to: reconnect by re-entering the credentials, like the menu does.
-        if (integration.isCustomFields) {
-          modal.openModal({
-            title: t('custom_url', 'Custom URL'),
-            withCloseButton: false,
-            classNames: {
-              modal: 'md',
-            },
-            children: (
-              <CustomVariables
-                identifier={integration.identifier}
-                gotoUrl={(url: string) => router.push(url)}
-                variables={integration.customFields || []}
-              />
-            ),
-          });
-          return;
-        }
-
-        const { url } = await (
-          await fetch(
-            `/integrations/social/${integration.identifier}?refresh=${integration.internalId}`,
-            {
-              method: 'GET',
-            }
-          )
-        ).json();
-        window.location.href = url;
-      },
-    []
-  );
+  const refreshChannel = useRefreshChannel();
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -638,6 +599,7 @@ export const LaunchesComponent = () => {
             onClick={() => setChannelsOpen(false)}
           />
         )}
+        {!shellSlots && (
         <div
           className={clsx(
             'flex relative flex-col',
@@ -758,8 +720,9 @@ export const LaunchesComponent = () => {
             </div>
           </div>
         </div>
+        )}
         <div className="bg-newBgColorInner flex-1 min-w-0 flex-col flex p-[20px] mobile:p-[12px] gap-[12px] mobile:min-h-[600px]">
-          <div className="hidden mobile:flex gap-[8px]">
+          <div className={clsx('hidden gap-[8px]', !shellSlots && 'mobile:flex')}>
             <div
               onClick={() => setChannelsOpen(true)}
               className="cursor-pointer h-[44px] px-[12px] bg-btnSimple text-btnText rounded-[8px] flex items-center gap-[8px] select-none"
