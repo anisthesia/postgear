@@ -3,11 +3,13 @@
 import { FC, useMemo } from 'react';
 import { useCalendar } from '@gitroom/frontend/components/launches/calendar.context';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
+import { useInbox } from '@gitroom/frontend/components/inbox/use.inbox';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 export const AttentionStrip: FC = () => {
   const { posts, postDates } = useCalendar();
   const t = useT();
+  const toReview = useInbox().data?.counts.approvals || 0;
 
   const { failed, today } = useMemo(() => {
     const now = newDayjs();
@@ -22,7 +24,7 @@ export const AttentionStrip: FC = () => {
     };
   }, [posts, postDates]);
 
-  if (!failed && !today) {
+  if (!failed && !today && !toReview) {
     return null;
   }
 
@@ -31,6 +33,11 @@ export const AttentionStrip: FC = () => {
       {failed > 0 && (
         <span className="px-[10px] py-[4px] rounded-full bg-red-500/15 text-red-500 font-[600]">
           {failed} {t('failed', 'failed')}
+        </span>
+      )}
+      {toReview > 0 && (
+        <span className="px-[10px] py-[4px] rounded-full bg-amber-500/15 text-amber-600 font-[600]">
+          {toReview} {t('to_review', 'to review')}
         </span>
       )}
       {today > 0 && (

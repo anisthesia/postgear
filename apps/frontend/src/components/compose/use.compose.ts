@@ -13,6 +13,7 @@ import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
 import { Integrations } from '@gitroom/frontend/components/launches/calendar.context';
 
 export type ComposeMedia = { id: string; path: string };
+export type ComposeTag = { value: string; label: string };
 export type ComposeSaveType = 'draft' | 'schedule' | 'now';
 export type ComposeWhen =
   | { kind: 'slot' }
@@ -72,7 +73,8 @@ export const textToHtml = (text: string) =>
 
 export const useCompose = (
   integrations: (Integrations & { refreshNeeded?: boolean })[],
-  onSaved?: () => void
+  onSaved?: () => void,
+  tags: ComposeTag[] = []
 ) => {
   const fetch = useFetch();
   const toaster = useToaster();
@@ -175,7 +177,10 @@ export const useCompose = (
     ])
   );
 
-  const submit = async (type: ComposeSaveType) => {
+  const submit = async (
+    type: ComposeSaveType,
+    review?: 'TEAM' | 'CLIENT'
+  ) => {
     if (!selected.length) {
       toaster.show(
         t('compose_pick_channel', 'Pick at least one channel'),
@@ -243,7 +248,7 @@ export const useCompose = (
       method: 'POST',
       body: JSON.stringify({
         type,
-        tags: [],
+        tags,
         shortLink: false,
         date: date.utc().format('YYYY-MM-DDTHH:mm:ss'),
         posts,
@@ -252,6 +257,20 @@ export const useCompose = (
     if (!response.ok) {
       const { message } = await response.json().catch(() => ({}));
       return failed(typeof message === 'string' ? message : undefined);
+    }
+
+    // saved as a draft first, the review request needs the saved group
+    if (review) {
+      const reviewResponse = await fetch(`/posts/${posts[0].group}/review/request`, {
+        method: 'POST',
+        body: JSON.stringify({ target: review }),
+      });
+      if (!reviewResponse.ok) {
+        toaster.show(
+          t('review_failed', 'Could not update the review'),
+          'warning'
+        );
+      }
     }
 
     toaster.show(t('added_successfully', 'Added successfully'));

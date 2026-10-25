@@ -11,6 +11,10 @@ import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
 import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
 import { useToaster } from '@gitroom/react/toaster/toaster';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
+import {
+  ReviewPill,
+  useReviewStatuses,
+} from '@gitroom/frontend/components/inbox/review.actions';
 import { isUSCitizen } from '@gitroom/frontend/components/launches/helpers/isuscitizen.utils';
 
 export type QueueStatus =
@@ -67,6 +71,7 @@ export const PostCard: FC<{
   const toaster = useToaster();
   const { integrations, reloadCalendarView } = useCalendar();
   const status = cardStatus(card, now);
+  const reviewStatus = useReviewStatuses().get(card.posts[0].group);
 
   const labels: Record<QueueStatus, string> = {
     published: t('published', 'Published'),
@@ -155,13 +160,16 @@ export const PostCard: FC<{
         <span className="text-[12px] text-textItemBlur">
           {card.date.format(isUSCitizen() ? 'hh:mm A' : 'HH:mm')}
         </span>
-        <span
-          className={clsx(
-            'px-[6px] py-[1px] rounded-full text-[11px] font-[600]',
-            statusStyle[status]
-          )}
-        >
-          {labels[status]}
+        <span className="flex items-center gap-[4px]">
+          <ReviewPill status={reviewStatus} />
+          <span
+            className={clsx(
+              'px-[6px] py-[1px] rounded-full text-[11px] font-[600]',
+              statusStyle[status]
+            )}
+          >
+            {labels[status]}
+          </span>
         </span>
       </div>
       <ChannelChips posts={card.posts} />

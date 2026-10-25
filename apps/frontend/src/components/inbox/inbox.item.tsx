@@ -11,6 +11,7 @@ import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
 import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
 import { useToaster } from '@gitroom/react/toaster/toaster';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
+import { ReviewActions } from '@gitroom/frontend/components/inbox/review.actions';
 import {
   InboxComment,
   InboxPost,
@@ -130,7 +131,12 @@ export const PostItem: FC<{
         )}
       </>
     ),
-    approval: open,
+    approval: (
+      <>
+        {open}
+        <ReviewActions group={post.group} reload={reload} />
+      </>
+    ),
     changes: open,
     waiting: (
       <Button onClick={copyPreview}>

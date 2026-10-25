@@ -5,6 +5,10 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 import SafeImage from '@gitroom/react/helpers/safe.image';
 import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
+import {
+  ReviewPill,
+  useReviewStatuses,
+} from '@gitroom/frontend/components/inbox/review.actions';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 const statusStyle: Record<string, string> = {
@@ -20,6 +24,7 @@ export const AgendaItem: FC<{
   onOpen: () => void;
 }> = ({ post, date, onOpen }) => {
   const t = useT();
+  const reviewStatus = useReviewStatuses().get(post.group);
   const labels: Record<string, string> = useMemo(
     () => ({
       QUEUE: t('scheduled', 'Scheduled'),
@@ -56,14 +61,17 @@ export const AgendaItem: FC<{
         </div>
         <div className="text-[14px] truncate">{excerpt}</div>
       </div>
-      <span
-        className={clsx(
-          'px-[8px] py-[2px] rounded-full text-[11px] font-[600] shrink-0',
-          statusStyle[post.state]
-        )}
-      >
-        {labels[post.state]}
-      </span>
+      <div className="flex flex-col items-end gap-[4px] shrink-0">
+        <ReviewPill status={reviewStatus} />
+        <span
+          className={clsx(
+            'px-[8px] py-[2px] rounded-full text-[11px] font-[600]',
+            statusStyle[post.state]
+          )}
+        >
+          {labels[post.state]}
+        </span>
+      </div>
     </button>
   );
 };

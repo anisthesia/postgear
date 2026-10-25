@@ -3,6 +3,8 @@
 import { FC } from 'react';
 import dayjs from 'dayjs';
 import { AgendaItem } from '@gitroom/frontend/components/shell/mobile/agenda.item';
+import { useInbox } from '@gitroom/frontend/components/inbox/use.inbox';
+import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 export const AttentionCards: FC<{
@@ -12,8 +14,10 @@ export const AttentionCards: FC<{
   open: (post: any) => () => void;
 }> = ({ failed, drafts, dateOf, open }) => {
   const t = useT();
+  const approvals = useInbox().data?.approvals || [];
   const groups = [
     { key: 'failed', title: t('failed', 'Failed'), posts: failed, tone: 'text-red-500' },
+    { key: 'review', title: t('to_review', 'To review'), posts: approvals, tone: 'text-amber-600' },
     { key: 'drafts', title: t('drafts', 'Drafts'), posts: drafts, tone: 'text-textItemBlur' },
   ].filter((g) => g.posts.length);
 
@@ -32,7 +36,11 @@ export const AttentionCards: FC<{
             <AgendaItem
               key={post.id}
               post={post}
-              date={dateOf(post)}
+              date={
+                g.key === 'review'
+                  ? newDayjs(post.reviewRequestedAt || post.updatedAt)
+                  : dateOf(post)
+              }
               onOpen={open(post)}
             />
           ))}

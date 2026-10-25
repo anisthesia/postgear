@@ -6,7 +6,7 @@ import { ComposeSaveType } from '@gitroom/frontend/components/compose/use.compos
 
 export const ComposeFooter: FC<{
   loading: boolean;
-  onSubmit: (type: ComposeSaveType) => void;
+  onSubmit: (type: ComposeSaveType, review?: 'TEAM' | 'CLIENT') => void;
 }> = ({ loading, onSubmit }) => {
   const t = useT();
   const [more, setMore] = useState(false);
@@ -46,6 +46,21 @@ export const ComposeFooter: FC<{
           >
             {t('post_now', 'Post now')}
           </button>
+          {(['TEAM', 'CLIENT'] as const).map((target) => (
+            <button
+              key={target}
+              disabled={loading}
+              onClick={() => {
+                setMore(false);
+                onSubmit('draft', target);
+              }}
+              className="h-[32px] px-[12px] rounded-[6px] hover:bg-btnSimple text-[13px] whitespace-nowrap w-full text-start"
+            >
+              {target === 'TEAM'
+                ? t('request_team_review', 'Request team review')
+                : t('request_client_review', 'Request client review')}
+            </button>
+          ))}
         </div>
       )}
     </div>
