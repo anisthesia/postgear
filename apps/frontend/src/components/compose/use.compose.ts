@@ -176,23 +176,32 @@ export const useCompose = (
   useEffect(() => {
     // both the panel and the sheet render nothing while closed
     if (!selected.length || !state.open) {
+      setIssues({});
       return;
     }
     // a superseded or unmounted run must not overwrite newer limits and issues
     let cancelled = false;
     const handle = setTimeout(async () => {
-      const response = await fetch('/posts/valid', {
-        method: 'POST',
-        body: JSON.stringify({
-          type: 'draft',
-          posts: buildPosts().map((p) => ({ ...p, group: 'compose' })),
-        }),
-      });
-      if (cancelled || !response.ok) {
+      let result: { id: string; maximumCharacters: number }[];
+      try {
+        const response = await fetch('/posts/valid', {
+          method: 'POST',
+          body: JSON.stringify({
+            type: 'draft',
+            posts: buildPosts().map((p) => ({ ...p, group: 'compose' })),
+          }),
+        });
+        if (!response.ok) {
+          throw new Error('validation failed');
+        }
+        result = await response.json();
+      } catch {
+        // stale issues must not block Schedule, submit() validates again
+        if (!cancelled) {
+          setIssues({});
+        }
         return;
       }
-      const result: { id: string; maximumCharacters: number }[] =
-        await response.json();
       if (cancelled) {
         return;
       }
@@ -297,6 +306,7 @@ export const useCompose = (
     toaster.show(t('added_successfully', 'Added successfully'));
     setLoading(false);
     state.reset();
+    setIssues({});
     onSaved?.();
     return true;
   };
