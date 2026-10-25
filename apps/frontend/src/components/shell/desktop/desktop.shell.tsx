@@ -21,6 +21,7 @@ import { setSentryUser } from '@gitroom/react/sentry/initialize.sentry.client';
 import { setUserTimezone } from '@gitroom/frontend/components/layout/set.timezone';
 import {
   ATTENTION_SLOT_ID,
+  COMPOSE_SLOT_ID,
   TOPBAR_SLOT_ID,
   TopBar,
   TopBarToolbar,
@@ -29,6 +30,7 @@ import {
   CHANNELS_SLOT_ID,
   Rail,
 } from '@gitroom/frontend/components/shell/desktop/rail';
+import { ComposePanel } from '@gitroom/frontend/components/compose/compose.panel';
 import { AttentionStrip } from '@gitroom/frontend/components/shell/desktop/attention.strip';
 import { ChannelsList } from '@gitroom/frontend/components/shell/desktop/channels.list';
 import {
@@ -40,7 +42,12 @@ import {
   NavShortcuts,
 } from '@gitroom/frontend/components/shell/desktop/shortcuts';
 
-type Slots = { topbar: HTMLElement; attention: HTMLElement; channels: HTMLElement };
+type Slots = {
+  topbar: HTMLElement;
+  attention: HTMLElement;
+  channels: HTMLElement;
+  compose: HTMLElement;
+};
 
 // The shell slots the calendar page fills, null when there is no desktop shell
 export const useShellSlots = () => {
@@ -51,16 +58,20 @@ export const useShellSlots = () => {
     const topbar = document.getElementById(TOPBAR_SLOT_ID);
     const attention = document.getElementById(ATTENTION_SLOT_ID);
     const channels = document.getElementById(CHANNELS_SLOT_ID);
-    return topbar && attention && channels
-      ? { topbar, attention, channels }
+    const compose = document.getElementById(COMPOSE_SLOT_ID);
+    return topbar && attention && channels && compose
+      ? { topbar, attention, channels, compose }
       : null;
   });
   useEffect(() => {
     const topbar = document.getElementById(TOPBAR_SLOT_ID);
     const attention = document.getElementById(ATTENTION_SLOT_ID);
     const channels = document.getElementById(CHANNELS_SLOT_ID);
+    const compose = document.getElementById(COMPOSE_SLOT_ID);
     setSlots(
-      topbar && attention && channels ? { topbar, attention, channels } : null
+      topbar && attention && channels && compose
+        ? { topbar, attention, channels, compose }
+        : null
     );
   }, []);
   return slots;
@@ -72,6 +83,7 @@ export const DesktopShellPortals: FC<{ slots: Slots }> = ({ slots }) => (
     {createPortal(<TopBarToolbar />, slots.topbar)}
     {createPortal(<AttentionStrip />, slots.attention)}
     {createPortal(<ChannelsList />, slots.channels)}
+    {createPortal(<ComposePanel />, slots.compose)}
     <CalendarShortcuts />
     <PaletteBridge />
   </>
@@ -128,6 +140,7 @@ export const DesktopShell: FC<{ children: ReactNode }> = ({ children }) => {
                 <div id={ATTENTION_SLOT_ID} className="flex flex-col empty:hidden" />
                 <div className={clsx('flex flex-1 min-w-0 gap-[1px]')}>
                   {children}
+                  <div id={COMPOSE_SLOT_ID} className="flex empty:hidden" />
                 </div>
               </div>
             </div>
