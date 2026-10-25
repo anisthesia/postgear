@@ -16,11 +16,6 @@ interface Tab {
   icon: ReactNode;
 }
 
-const openInbox = () =>
-  document
-    .querySelector<HTMLElement>('[data-shell-inbox] .cursor-pointer')
-    ?.click();
-
 const Svg: FC<{ d: string }> = ({ d }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
     <path
@@ -68,7 +63,8 @@ export const TabBar: FC = () => {
     },
     {
       label: t('inbox', 'Inbox'),
-      onClick: openInbox,
+      href: '/inbox',
+      active: pathname.startsWith('/inbox'),
       icon: (
         <Svg d="M4 13V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7m-16 0v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5m-16 0h4l1 2h6l1-2h4" />
       ),

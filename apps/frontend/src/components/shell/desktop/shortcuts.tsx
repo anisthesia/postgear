@@ -45,14 +45,7 @@ export const NavShortcuts: FC = () => {
   useHotkeys('g>m', go('/media'), options);
   useHotkeys('g>u', go('/plugs'), options);
   useHotkeys('g>s', go('/settings'), options);
-  useHotkeys(
-    'g>i',
-    () =>
-      document
-        .querySelector<HTMLElement>('[data-shell-inbox] .cursor-pointer')
-        ?.click(),
-    options
-  );
+  useHotkeys('g>i', go('/inbox'), options);
   useHotkeys('mod+k', openPalette, {
     preventDefault: true,
     enableOnFormTags: true,

@@ -61,7 +61,7 @@ export const matchRange = (
 interface BuildOptions {
   t: (key: string, fallback: string) => string;
   go: (path: string) => () => void;
-  openInbox: () => void;
+  openInbox?: () => void;
   query: string;
   organizations: { id: string; name: string }[];
   currentOrg?: string;
@@ -72,7 +72,6 @@ interface BuildOptions {
 export const buildItems = ({
   t,
   go,
-  openInbox,
   query,
   organizations,
   currentOrg,
@@ -130,7 +129,7 @@ export const buildItems = ({
 
   const destinations: PaletteItem[] = [
     { id: 'go-queue', group: 'goto', label: t('queue', 'Queue'), hint: 'G Q', run: go('/launches') },
-    { id: 'go-inbox', group: 'goto', label: t('inbox', 'Inbox'), hint: 'G I', run: openInbox },
+    { id: 'go-inbox', group: 'goto', label: t('inbox', 'Inbox'), hint: 'G I', run: go('/inbox') },
     { id: 'go-analytics', group: 'goto', label: t('analytics', 'Analytics'), hint: 'G A', run: go('/analytics') },
     { id: 'go-media', group: 'goto', label: t('media', 'Media'), hint: 'G M', run: go('/media') },
     { id: 'go-plugs', group: 'goto', label: t('automations', 'Automations'), hint: 'G U', run: go('/plugs') },
