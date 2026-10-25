@@ -1,7 +1,10 @@
 'use client';
 
-import { FC, useEffect, useMemo, useRef } from 'react';
+import { FC, useCallback, useMemo } from 'react';
+import useSWR from 'swr';
+import dayjs from 'dayjs';
 import {
+  CalendarContext,
   CalendarWeekProvider,
   useCalendar,
 } from '@gitroom/frontend/components/launches/calendar.context';
@@ -9,7 +12,9 @@ import { usePostActions } from '@gitroom/frontend/components/launches/calendar';
 import { useIntegrationList } from '@gitroom/frontend/components/launches/helpers/use.integration.list';
 import { DNDProvider } from '@gitroom/frontend/components/launches/helpers/dnd.provider';
 import { QuickPostSheet } from '@gitroom/frontend/components/compose/quick.post.sheet';
-import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
+import { fromUtc, newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
+import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
+import { expandPosts } from '@gitroom/helpers/utils/posts.list.minify';
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
 import { AgendaItem } from '@gitroom/frontend/components/shell/mobile/agenda.item';
 import { AttentionCards } from '@gitroom/frontend/components/shell/mobile/attention.cards';
@@ -17,22 +22,8 @@ import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 const TodayContent: FC = () => {
   const t = useT();
-  const { posts, postDates, loading, endDate, customer, setFilters } =
-    useCalendar();
+  const { posts, postDates, loading } = useCalendar();
   const { editPost } = usePostActions();
-
-  // the default week range stops at Sunday, tomorrow is next week then
-  useEffect(() => {
-    const tomorrow = newDayjs().add(1, 'day');
-    if (tomorrow.isAfter(newDayjs(endDate), 'day')) {
-      setFilters({
-        startDate: newDayjs().format('YYYY-MM-DD'),
-        endDate: tomorrow.format('YYYY-MM-DD'),
-        display: 'week',
-        customer,
-      });
-    }
-  }, []);
 
   const { failed, drafts, parts, tomorrow } = useMemo(() => {
     const now = newDayjs();
@@ -97,12 +88,59 @@ const TodayContent: FC = () => {
   );
 };
 
+// Today and tomorrow, fetched here so the view never touches the saved
+// calendar display or the URL the Queue uses
+const useTodayPosts = (customer: string | null) => {
+  const fetch = useFetch();
+  const day = newDayjs().format('YYYY-MM-DD');
+  const load = useCallback(async () => {
+    const params = new URLSearchParams({
+      display: 'week',
+      customer: customer || '',
+      startDate: newDayjs().startOf('day').utc().format(),
+      endDate: newDayjs().add(1, 'day').endOf('day').utc().format(),
+    }).toString();
+    return expandPosts(await (await fetch(`/posts?${params}`)).json());
+  }, [customer]);
+  return useSWR(`today-posts-${day}-${customer || ''}`, load, {
+    refreshInterval: 3600000,
+    refreshWhenOffline: false,
+    refreshWhenHidden: false,
+    revalidateOnFocus: false,
+  });
+};
+
+const TodayData: FC = () => {
+  const calendar = useCalendar();
+  const { data, isLoading, mutate } = useTodayPosts(calendar.customer);
+  const posts = useMemo(() => data?.posts || [], [data?.posts]);
+  const value = useMemo(
+    () => ({
+      ...calendar,
+      posts,
+      postDates: new Map<object, dayjs.Dayjs>(
+        posts.map((post: any) => [post, fromUtc(post.publishDate)])
+      ),
+      loading: isLoading,
+      reloadCalendarView: () => {
+        mutate();
+      },
+    }),
+    [calendar, posts, isLoading, mutate]
+  );
+  return (
+    <CalendarContext.Provider value={value}>
+      <TodayContent />
+    </CalendarContext.Provider>
+  );
+};
+
 export const Today: FC = () => {
   const { data: integrations } = useIntegrationList();
   return (
     <DNDProvider>
       <CalendarWeekProvider integrations={integrations || []}>
-        <TodayContent />
+        <TodayData />
       </CalendarWeekProvider>
     </DNDProvider>
   );
