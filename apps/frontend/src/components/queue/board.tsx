@@ -109,6 +109,15 @@ export const Board: FC = () => {
   useHotkeys('enter', act(), options);
   useHotkeys('d', act(true), options);
 
+  // a narrow board scrolls sideways, keep today in view
+  useEffect(() => {
+    if (!loading) {
+      document
+        .querySelector('[data-board-today]')
+        ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+  }, [loading, startDate]);
+
   useEffect(() => {
     if (selectedKey) {
       document
@@ -122,8 +131,8 @@ export const Board: FC = () => {
   }
 
   return (
-    <div className="flex-1 overflow-x-auto">
-      <div className="grid grid-cols-7 gap-[1px] bg-newBgLineColor min-w-[980px] min-h-full">
+    <div className="flex-1 min-w-0 overflow-x-auto">
+      <div className="grid grid-cols-[repeat(7,minmax(130px,1fr))] gap-[1px] bg-newBgLineColor min-h-full">
         {columns.map(({ day, cards }) => (
           <BoardColumn
             key={day.format('YYYY-MM-DD')}

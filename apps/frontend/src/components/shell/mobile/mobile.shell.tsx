@@ -2,6 +2,7 @@
 
 import { FC, ReactNode, useCallback, useEffect } from 'react';
 import useSWR from 'swr';
+import dynamic from 'next/dynamic';
 import { CopilotKit } from '@copilotkit/react-core';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
@@ -20,6 +21,12 @@ import { setUserTimezone } from '@gitroom/frontend/components/layout/set.timezon
 import NotificationComponent from '@gitroom/frontend/components/notifications/notification.component';
 import { Logo } from '@gitroom/frontend/components/new-layout/logo';
 import { TabBar } from '@gitroom/frontend/components/shell/mobile/tab.bar';
+
+// same light/dark switch as the desktop top bar: the `mode` cookie sets the body class
+const ModeComponent = dynamic(
+  () => import('@gitroom/frontend/components/layout/mode.component'),
+  { ssr: false }
+);
 
 export const MobileShell: FC<{ children: ReactNode }> = ({ children }) => {
   const fetch = useFetch();
@@ -64,11 +71,19 @@ export const MobileShell: FC<{ children: ReactNode }> = ({ children }) => {
           <div className="flex flex-col min-h-screen text-newTextColor pb-[calc(72px+env(safe-area-inset-bottom))]">
             {user?.admin && <Impersonate />}
             <header className="flex items-center justify-between px-[12px] pt-[env(safe-area-inset-top)] h-[56px] bg-newBgColorInner">
-              <div className="scale-[0.6] origin-left h-[40px] overflow-hidden">
-                <Logo />
+              <div className="flex items-center gap-[8px]">
+                <div className="[&_svg]:!min-w-[28px] [&_svg]:!min-h-[28px] [&_svg]:!w-[28px] [&_svg]:!h-[28px] [&_svg]:!mt-0">
+                  <Logo />
+                </div>
+                <div className="text-[14px] font-[600] text-textItemFocused">
+                  postgear
+                </div>
               </div>
-              <div data-shell-inbox="" className="text-textItemBlur">
-                <NotificationComponent />
+              <div className="flex items-center gap-[16px] text-textItemBlur">
+                <ModeComponent />
+                <div data-shell-inbox="">
+                  <NotificationComponent />
+                </div>
               </div>
             </header>
             <main className="flex-1 min-w-0 flex flex-col">{children}</main>

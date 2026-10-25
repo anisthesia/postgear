@@ -8,6 +8,7 @@ import { Logo } from '@gitroom/frontend/components/new-layout/logo';
 import { OrganizationSelector } from '@gitroom/frontend/components/layout/organization.selector';
 import { useMenuItem } from '@gitroom/frontend/components/layout/top.menu';
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
+import { RailChannels } from '@gitroom/frontend/components/shell/desktop/channels.list';
 import { useInbox } from '@gitroom/frontend/components/inbox/use.inbox';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
@@ -140,6 +141,7 @@ export const Rail: FC = () => {
         </div>
       )}
       <div id={CHANNELS_SLOT_ID} className="flex flex-col" />
+      {user?.orgId && pathname.indexOf('/launches') !== 0 && <RailChannels />}
     </div>
   );
 };

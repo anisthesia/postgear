@@ -4,6 +4,7 @@ import { useCalendar, ListStateFilter } from '@gitroom/frontend/components/launc
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
+import useCookie from 'react-use-cookie';
 import { SelectCustomer } from '@gitroom/frontend/components/launches/select.customer';
 import { SelectChannels } from '@gitroom/frontend/components/launches/select.channels';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
@@ -48,6 +49,8 @@ export const Filters = () => {
   const calendar = useCalendar();
   const t = useT();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [device] = useCookie('pg-device', 'desktop');
+  const phone = device === 'mobile';
 
   // Set dayjs locale based on current language
   const currentLanguage = i18next.resolvedLanguage || 'en';
@@ -486,15 +489,18 @@ export const Filters = () => {
           isListView && 'hidden mobile:flex'
         )}
       >
-        <div
-          className={clsx(
-            'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',
-            calendar.display === 'board' && 'text-textItemFocused bg-boxFocused'
-          )}
-          onClick={setBoard}
-        >
-          {t('board', 'Board')}
-        </div>
+        {/* seven columns don't fit a phone */}
+        {!phone && (
+          <div
+            className={clsx(
+              'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',
+              calendar.display === 'board' && 'text-textItemFocused bg-boxFocused'
+            )}
+            onClick={setBoard}
+          >
+            {t('board', 'Board')}
+          </div>
+        )}
         <div
           className={clsx(
             'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',
