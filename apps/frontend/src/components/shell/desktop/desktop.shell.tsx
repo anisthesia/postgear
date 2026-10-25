@@ -32,6 +32,10 @@ import {
 import { AttentionStrip } from '@gitroom/frontend/components/shell/desktop/attention.strip';
 import { ChannelsList } from '@gitroom/frontend/components/shell/desktop/channels.list';
 import {
+  CommandPalette,
+  PaletteBridge,
+} from '@gitroom/frontend/components/shell/desktop/command.palette';
+import {
   CalendarShortcuts,
   NavShortcuts,
 } from '@gitroom/frontend/components/shell/desktop/shortcuts';
@@ -69,6 +73,7 @@ export const DesktopShellPortals: FC<{ slots: Slots }> = ({ slots }) => (
     {createPortal(<AttentionStrip />, slots.attention)}
     {createPortal(<ChannelsList />, slots.channels)}
     <CalendarShortcuts />
+    <PaletteBridge />
   </>
 );
 
@@ -113,6 +118,7 @@ export const DesktopShell: FC<{ children: ReactNode }> = ({ children }) => {
           <ShowPostSelector />
           <ContinueProvider />
           <NavShortcuts />
+          <CommandPalette />
           <div className="flex flex-col min-h-screen min-w-screen text-newTextColor p-[12px]">
             <div>{user?.admin ? <Impersonate /> : <div />}</div>
             <div className="flex-1 flex gap-[8px]">

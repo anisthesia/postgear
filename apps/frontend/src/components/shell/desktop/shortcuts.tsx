@@ -4,14 +4,17 @@ import { FC, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useCalendar } from '@gitroom/frontend/components/launches/calendar.context';
+import dayjs from 'dayjs';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
+import { openPalette } from '@gitroom/frontend/components/shell/desktop/palette.items';
 
-type Display = 'day' | 'week' | 'month' | 'list';
+type Display = 'day' | 'week' | 'month' | 'list' | 'board';
 
-const getDateRange = (display: Display) => {
-  const date = newDayjs();
+export const getDateRange = (display: Display, from?: dayjs.Dayjs) => {
+  const date = from || newDayjs();
   switch (display) {
     case 'week':
+    case 'board':
       return {
         startDate: date.startOf('isoWeek').format('YYYY-MM-DD'),
         endDate: date.endOf('isoWeek').format('YYYY-MM-DD'),
@@ -50,8 +53,11 @@ export const NavShortcuts: FC = () => {
         ?.click(),
     options
   );
-  // reserved for the command palette
-  useHotkeys('mod+k', () => {}, { preventDefault: true });
+  useHotkeys('mod+k', openPalette, {
+    preventDefault: true,
+    enableOnFormTags: true,
+    enableOnContentEditable: true,
+  });
   return null;
 };
 
@@ -74,6 +80,7 @@ export const CalendarShortcuts: FC = () => {
   useHotkeys('2', setDisplay('week'), options);
   useHotkeys('3', setDisplay('month'), options);
   useHotkeys('4', setDisplay('list'), options);
+  useHotkeys('5', setDisplay('board'), options);
   useHotkeys('t', () => setDisplay(calendar.display as Display)(), options);
   useHotkeys(
     'n',
