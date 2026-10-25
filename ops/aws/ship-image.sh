@@ -9,8 +9,10 @@ ROOT="$(git rev-parse --show-toplevel)"
 REF="${1:-HEAD}"
 SHA="$(git -C "$ROOT" rev-parse --short=8 "$REF")"
 KEY="${KEY:-$HOME/.ssh/postgear_aws}"
-HOST="$(terraform output -raw public_ip)"
-"$PWD/allow-my-ip.sh" >/dev/null
+# Terraform state lives in one checkout; point TF_DIR at its ops/aws when running from a worktree.
+TF_DIR="${TF_DIR:-$PWD}"
+HOST="$(terraform -chdir="$TF_DIR" output -raw public_ip)"
+"$TF_DIR/allow-my-ip.sh" >/dev/null
 
 echo "[ship] building postgear:$SHA (linux/amd64) from the committed tree"
 # git archive streams only tracked files, so a local .env or other ignored file never reaches the image
