@@ -179,10 +179,15 @@ export class IntegrationService {
     return this._integrationRepository.getIntegrationById(org, id);
   }
 
-  getIntegrationByInternalId(org: string, internalId: string) {
+  getIntegrationByInternalId(
+    org: string,
+    internalId: string,
+    providerIdentifier?: string | string[]
+  ) {
     return this._integrationRepository.getIntegrationByInternalId(
       org,
-      internalId
+      internalId,
+      providerIdentifier
     );
   }
 
@@ -217,9 +222,12 @@ export class IntegrationService {
     newProvider: string,
     auth: { id: string; username: string }
   ) {
+    // The same account can be live on more than one provider, so only look
+    // at the providers that migrate to this one.
     const existing = await this._integrationRepository.getIntegrationByInternalId(
       org,
-      oldInternalId
+      oldInternalId,
+      this._integrationManager.getMigrationSources(newProvider)
     );
 
     if (
@@ -244,7 +252,11 @@ export class IntegrationService {
     }
 
     if (
-      await this._integrationRepository.getIntegrationByInternalId(org, auth.id)
+      await this._integrationRepository.getIntegrationByInternalId(
+        org,
+        auth.id,
+        newProvider
+      )
     ) {
       throw new NotEnoughScopes(
         'This account is already connected as another channel, please delete one of them first'
@@ -283,7 +295,11 @@ export class IntegrationService {
     // the account already exists on the new provider: the normal upsert
     // updates it, nothing to adopt
     if (
-      await this._integrationRepository.getIntegrationByInternalId(org, auth.id)
+      await this._integrationRepository.getIntegrationByInternalId(
+        org,
+        auth.id,
+        newProvider
+      )
     ) {
       return;
     }
@@ -409,8 +425,16 @@ export class IntegrationService {
     return this._integrationRepository.enableAllIntegrations(org);
   }
 
-  async checkForDeletedOnceAndUpdate(org: string, page: string) {
-    return this._integrationRepository.checkForDeletedOnceAndUpdate(org, page);
+  async checkForDeletedOnceAndUpdate(
+    org: string,
+    page: string,
+    providerIdentifier?: string
+  ) {
+    return this._integrationRepository.checkForDeletedOnceAndUpdate(
+      org,
+      page,
+      providerIdentifier
+    );
   }
 
   async saveProviderPage(org: string, id: string, data: any) {
@@ -443,7 +467,8 @@ export class IntegrationService {
 
     await this.checkForDeletedOnceAndUpdate(
       org,
-      String(getIntegrationInformation.id)
+      String(getIntegrationInformation.id),
+      getIntegration.providerIdentifier
     );
     await this._integrationRepository.updateIntegration(id, {
       picture: getIntegrationInformation.picture,

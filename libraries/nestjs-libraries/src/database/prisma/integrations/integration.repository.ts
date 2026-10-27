@@ -172,28 +172,33 @@ export class IntegrationRepository {
       params.picture = await this.storage.uploadSimple(params.picture);
     }
 
-    const existing = await this._integration.model.integration.findUnique({
-      where: {
-        organizationId_internalId: {
-          organizationId: params.organizationId!,
-          internalId: params.internalId,
-        },
-      },
-    });
-
     // The page was picked through a fresh login: the row that keeps living
     // must also take that login's identity and refresh token, otherwise the
     // next refresh runs as the old identity and cannot find the page.
-    const fresh = existing
-      ? await this._integration.model.integration.findUnique({
-          where: { id },
-          select: {
-            rootInternalId: true,
-            refreshToken: true,
-            tokenExpiration: true,
-          },
-        })
-      : null;
+    const fresh = await this._integration.model.integration.findUnique({
+      where: { id },
+      select: {
+        providerIdentifier: true,
+        rootInternalId: true,
+        refreshToken: true,
+        tokenExpiration: true,
+      },
+    });
+
+    // Only a channel of the same provider is the same channel: another
+    // provider can reach the same account (Instagram through Facebook login
+    // and Instagram Login share the account id) and stores its token in its
+    // own format, so merging into it would leave that channel with a token it
+    // cannot use.
+    const existing = await this._integration.model.integration.findUnique({
+      where: {
+        organizationId_internalId_providerIdentifier: {
+          organizationId: params.organizationId!,
+          internalId: params.internalId,
+          providerIdentifier: fresh!.providerIdentifier,
+        },
+      },
+    });
 
     if (existing) {
       await this._posts.model.post.updateMany({
@@ -248,11 +253,20 @@ export class IntegrationRepository {
     });
   }
 
-  getIntegrationByInternalId(org: string, internalId: string) {
+  getIntegrationByInternalId(
+    org: string,
+    internalId: string,
+    providerIdentifier?: string | string[]
+  ) {
     return this._integration.model.integration.findFirst({
       where: {
         organizationId: org,
         internalId,
+        ...(Array.isArray(providerIdentifier)
+          ? { providerIdentifier: { in: providerIdentifier } }
+          : providerIdentifier
+          ? { providerIdentifier }
+          : {}),
         deletedAt: null,
       },
     });
@@ -272,13 +286,15 @@ export class IntegrationRepository {
   ) {
     // A soft-deleted channel can still hold the target internalId
     // (deleteChannel keeps it): rename it out of the way like updateIntegration
-    // does, otherwise the organizationId_internalId unique constraint rejects
-    // the migration. Live channels are rejected by the service before this.
+    // does, otherwise the organizationId_internalId_providerIdentifier unique
+    // constraint rejects the migration. Live channels are rejected by the
+    // service before this.
     const existing = await this._integration.model.integration.findUnique({
       where: {
-        organizationId_internalId: {
+        organizationId_internalId_providerIdentifier: {
           organizationId: org,
           internalId,
+          providerIdentifier,
         },
       },
     });
@@ -344,9 +360,10 @@ export class IntegrationRepository {
       : {};
     const upsert = await this._integration.model.integration.upsert({
       where: {
-        organizationId_internalId: {
+        organizationId_internalId_providerIdentifier: {
           internalId,
           organizationId: org,
+          providerIdentifier: provider,
         },
       },
       create: {
@@ -405,6 +422,7 @@ export class IntegrationRepository {
             where: {
               organizationId: org,
               internalId: internalId,
+              providerIdentifier: provider,
             },
           })
         )?.rootInternalId || internalId;
@@ -865,11 +883,16 @@ export class IntegrationRepository {
     }
   }
 
-  async checkForDeletedOnceAndUpdate(org: string, page: string) {
+  async checkForDeletedOnceAndUpdate(
+    org: string,
+    page: string,
+    providerIdentifier?: string
+  ) {
     return this._integration.model.integration.updateMany({
       where: {
         organizationId: org,
         internalId: page,
+        ...(providerIdentifier ? { providerIdentifier } : {}),
         deletedAt: {
           not: null,
         },
