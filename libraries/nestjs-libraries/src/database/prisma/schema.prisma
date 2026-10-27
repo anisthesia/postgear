@@ -398,7 +398,7 @@ model Integration {
   plugs                 Plugs[]
   posts                 Post[]
 
-  @@unique([organizationId, internalId])
+  @@unique([organizationId, internalId, providerIdentifier])
   @@index([rootInternalId])
   @@index([organizationId])
   @@index([providerIdentifier])
