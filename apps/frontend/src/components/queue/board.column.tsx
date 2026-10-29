@@ -3,7 +3,9 @@
 import { FC } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
+import { useDrop } from 'react-dnd';
 import {
+  canMoveTo,
   PostCard,
   QueueCard,
 } from '@gitroom/frontend/components/queue/post.card';
@@ -18,14 +20,39 @@ export const BoardColumn: FC<{
   selectedKey: string | null;
   open: (card: QueueCard) => () => void;
   addAt: (date: dayjs.Dayjs) => () => void;
-}> = ({ day, today, future, cards, now, selectedKey, open, addAt }) => {
+  reschedule: (card: QueueCard, day: dayjs.Dayjs) => void;
+}> = ({
+  day,
+  today,
+  future,
+  cards,
+  now,
+  selectedKey,
+  open,
+  addAt,
+  reschedule,
+}) => {
   const t = useT();
+  const [{ over }, drop] = useDrop(
+    () => ({
+      accept: 'queue-card',
+      canDrop: (card: QueueCard) => canMoveTo(card, day, now),
+      drop: (card: QueueCard) => reschedule(card, day),
+      collect: (monitor) => ({
+        over: monitor.isOver() && monitor.canDrop(),
+      }),
+    }),
+    [day, now, reschedule]
+  );
   return (
     <div
+      // @ts-ignore
+      ref={drop}
       {...(today && { 'data-board-today': '' })}
       className={clsx(
-        'flex flex-col gap-[6px] min-w-0 p-[8px] bg-newBgColorInner',
-        today && 'bg-boxFocused'
+        'flex flex-col gap-[6px] min-w-0 p-[8px] bg-newBgColorInner outline outline-2 -outline-offset-2',
+        today && 'bg-boxFocused',
+        over ? 'outline-btnPrimary' : 'outline-transparent'
       )}
     >
       <div

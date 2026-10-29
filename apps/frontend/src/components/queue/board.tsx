@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
@@ -13,15 +13,32 @@ import { useModals } from '@gitroom/frontend/components/layout/new-modal';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
 import { BoardColumn } from '@gitroom/frontend/components/queue/board.column';
-import { QueueCard } from '@gitroom/frontend/components/queue/post.card';
+import {
+  canMoveTo,
+  dateOn,
+  QueueCard,
+} from '@gitroom/frontend/components/queue/post.card';
+import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
+import { useToaster } from '@gitroom/react/toaster/toaster';
+import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 const options = { preventDefault: true };
 
 export const Board: FC = () => {
-  const { startDate, posts, postDates, loading, integrations, reloadCalendarView } =
-    useCalendar();
+  const {
+    startDate,
+    posts,
+    postDates,
+    loading,
+    integrations,
+    reloadCalendarView,
+    changeDate,
+  } = useCalendar();
   const now = useNow();
   const modal = useModals();
+  const fetch = useFetch();
+  const toaster = useToaster();
+  const t = useT();
   const { editPost } = usePostActions();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
@@ -96,7 +113,55 @@ export const Board: FC = () => {
     [cards, selectedKey]
   );
 
+  // same call the calendar makes when a post is dropped on another slot,
+  // every channel of the card moves and keeps its time of day
+  // one move at a time, quick shift+arrow presses could land out of order
+  const moving = useRef(false);
+  const reschedule = useCallback(
+    async (card: QueueCard, day: dayjs.Dayjs) => {
+      if (moving.current || !canMoveTo(card, day, now)) return;
+      moving.current = true;
+      const date = dateOn(card, day);
+      // a recurring post is drawn again on every day it repeats, reload instead
+      const recurring = card.posts.some((p) => p.intervalInDays);
+      if (!recurring) {
+        card.posts.forEach((p) => changeDate(p.id, date));
+      }
+      setSelectedKey(`${card.posts[0].group}-${date.valueOf()}`);
+      const results = await Promise.all(
+        card.posts.map((p) =>
+          fetch(`/posts/${p.id}/date`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              date: date.utc().format('YYYY-MM-DDTHH:mm:ss'),
+              action: 'schedule',
+            }),
+          })
+        )
+      ).finally(() => {
+        moving.current = false;
+      });
+      if (results.some((r) => !r.ok)) {
+        toaster.show(
+          t('post_move_failed', 'Could not move the post'),
+          'warning'
+        );
+      }
+      reloadCalendarView();
+    },
+    [now, changeDate, fetch, toaster, t, reloadCalendarView]
+  );
+
   const selected = cards.find((c) => c.key === selectedKey);
+
+  // shift+arrows move the selected card a day, kept inside the visible week
+  const shift = (step: number) => () => {
+    if (!selected) return;
+    const day = selected.date.add(step, 'day');
+    if (columns.some((c) => c.day.isSame(day, 'day'))) {
+      reschedule(selected, day);
+    }
+  };
   // Enter and D on a focused card button would also click it
   const act = (duplicate?: boolean) => () => {
     if (selected && document.activeElement?.tagName !== 'BUTTON') {
@@ -108,6 +173,8 @@ export const Board: FC = () => {
   useHotkeys('k', move(-1), options);
   useHotkeys('enter', act(), options);
   useHotkeys('d', act(true), options);
+  useHotkeys('shift+left', shift(-1), options);
+  useHotkeys('shift+right', shift(1), options);
 
   // a narrow board scrolls sideways, keep today in view
   useEffect(() => {
@@ -144,6 +211,7 @@ export const Board: FC = () => {
             selectedKey={selectedKey}
             open={(card) => open(card)}
             addAt={addAt}
+            reschedule={reschedule}
           />
         ))}
       </div>

@@ -3,6 +3,7 @@
 import { FC, MouseEvent, useCallback, useMemo } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
+import { useDrag } from 'react-dnd';
 import { useRouter } from 'next/navigation';
 import { useCalendar } from '@gitroom/frontend/components/launches/calendar.context';
 import { ChannelChips } from '@gitroom/frontend/components/queue/channel.chips';
@@ -59,6 +60,30 @@ export const cardStatus = (card: QueueCard, now: dayjs.Dayjs): QueueStatus => {
   return order.find((s) => statuses.includes(s))!;
 };
 
+// only cards whose every post is still waiting to go out can be moved,
+// a published channel in the group would be refused by the server
+export const movable = (card: QueueCard, now: dayjs.Dayjs) =>
+  card.posts.every(
+    (p) =>
+      p.state === 'DRAFT' || (p.state === 'QUEUE' && card.date.isAfter(now))
+  );
+
+// the same time of day on another day
+export const dateOn = (card: QueueCard, day: dayjs.Dayjs) =>
+  day
+    .hour(card.date.hour())
+    .minute(card.date.minute())
+    .second(card.date.second());
+
+export const canMoveTo = (
+  card: QueueCard,
+  day: dayjs.Dayjs,
+  now: dayjs.Dayjs
+) =>
+  movable(card, now) &&
+  !day.isSame(card.date, 'day') &&
+  dateOn(card, day).isAfter(now);
+
 export const PostCard: FC<{
   card: QueueCard;
   now: dayjs.Dayjs;
@@ -72,6 +97,17 @@ export const PostCard: FC<{
   const { integrations, reloadCalendarView } = useCalendar();
   const status = cardStatus(card, now);
   const reviewStatus = useReviewStatuses().get(card.posts[0].group);
+  const canDrag = movable(card, now);
+
+  const [{ dragging }, dragRef] = useDrag(
+    () => ({
+      type: 'queue-card',
+      item: card,
+      canDrag,
+      collect: (monitor) => ({ dragging: monitor.isDragging() }),
+    }),
+    [card, canDrag]
+  );
 
   const labels: Record<QueueStatus, string> = {
     published: t('published', 'Published'),
@@ -149,10 +185,14 @@ export const PostCard: FC<{
 
   return (
     <div
+      // @ts-ignore
+      ref={dragRef}
       data-card-key={card.key}
       onClick={open}
       className={clsx(
-        'flex flex-col gap-[6px] p-[8px] rounded-[8px] bg-newColColor cursor-pointer text-start outline outline-2',
+        'flex flex-col gap-[6px] p-[8px] rounded-[8px] bg-newColColor text-start outline outline-2',
+        canDrag ? 'cursor-grab' : 'cursor-pointer',
+        dragging && 'opacity-40',
         selected ? 'outline-btnPrimary' : 'outline-transparent'
       )}
     >
