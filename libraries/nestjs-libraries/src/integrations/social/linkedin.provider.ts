@@ -63,9 +63,9 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
   oneTimeToken = true;
 
   isBetweenSteps = false;
+  // no openid/profile: LinkedIn will not add "Sign In with OpenID Connect"
+  // next to the Community Management API, so the profile comes from /v2/me
   scopes = [
-    'openid',
-    'profile',
     'w_member_social',
     'r_basicprofile',
     'rw_organization_admin',
@@ -148,25 +148,7 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
       })
     ).json();
 
-    const { vanityName } = await (
-      await fetch('https://api.linkedin.com/v2/me', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-    ).json();
-
-    const {
-      name,
-      sub: id,
-      picture,
-    } = await (
-      await fetch('https://api.linkedin.com/v2/userinfo', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-    ).json();
+    const { id, name, picture, username } = await this.profile(accessToken);
 
     return {
       id,
@@ -175,7 +157,33 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
       expiresIn: expires_in,
       name,
       picture: picture || '',
-      username: vanityName,
+      username,
+    };
+  }
+
+  // the member id is the same value the OpenID "sub" returned, so existing
+  // channels keep matching on internalId
+  protected async profile(accessToken: string) {
+    const data = await (
+      await fetch(
+        'https://api.linkedin.com/v2/me?projection=(id,localizedFirstName,localizedLastName,vanityName,profilePicture(displayImage~:playableStreams))',
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+    ).json();
+
+    return {
+      id: data.id,
+      name: [data.localizedFirstName, data.localizedLastName]
+        .filter(Boolean)
+        .join(' '),
+      picture:
+        data.profilePicture?.['displayImage~']?.elements?.[0]?.identifiers?.[0]
+          ?.identifier,
+      username: data.vanityName,
     };
   }
 
@@ -228,25 +236,7 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
 
     this.checkScopes(this.scopes, scope);
 
-    const {
-      name,
-      sub: id,
-      picture,
-    } = await (
-      await fetch('https://api.linkedin.com/v2/userinfo', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-    ).json();
-
-    const { vanityName } = await (
-      await fetch('https://api.linkedin.com/v2/me', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-    ).json();
+    const { id, name, picture, username } = await this.profile(accessToken);
 
     return {
       id,
@@ -255,7 +245,7 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
       expiresIn,
       name,
       picture,
-      username: vanityName,
+      username,
     };
   }
 
