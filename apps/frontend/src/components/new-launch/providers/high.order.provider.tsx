@@ -51,6 +51,7 @@ export const withProvider = function <T extends object>(params: {
   dto?: any;
   maximumCharacters?: number | ((settings: any) => number);
   inlineImages?: boolean | ((values: any) => boolean);
+  defaultSettings?: Record<string, any>;
 }) {
   const {
     postComment,
@@ -58,6 +59,7 @@ export const withProvider = function <T extends object>(params: {
     CustomPreviewComponent,
     dto,
     maximumCharacters,
+    defaultSettings,
   } = params;
 
   const Wrapped = forwardRef((props: { id: string }, ref) => {
@@ -371,6 +373,7 @@ export const withProvider = function <T extends object>(params: {
     dto,
     postComment,
     maximumCharacters,
+    defaultSettings,
   };
 
   return Wrapped;
@@ -385,6 +388,7 @@ export const getProviderSettingsMeta = (component: unknown) => {
         dto?: any;
         postComment: PostComment;
         maximumCharacters?: number | ((settings: any) => number);
+        defaultSettings?: Record<string, any>;
       }
     | undefined;
 };

@@ -11,6 +11,8 @@ import { countLength } from '@gitroom/helpers/utils/count.length';
 import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
 import { newDayjs } from '@gitroom/frontend/components/layout/set.timezone';
 import { Integrations } from '@gitroom/frontend/components/launches/calendar.context';
+import { Providers } from '@gitroom/frontend/components/new-launch/providers/show.all.providers';
+import { getProviderSettingsMeta } from '@gitroom/frontend/components/new-launch/providers/high.order.provider';
 
 export type ComposeMedia = { id: string; path: string };
 export type ComposeTag = { value: string; label: string };
@@ -64,6 +66,13 @@ export const openCompose = () => useComposeStore.getState().setOpen(true);
 // the editor stores html, the panel writes plain text
 const escapeHtml = (text: string) =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// the panel never mounts a provider's SettingsComponent, so it sends the defaults it would register
+const defaultSettingsOf = (identifier: string) => ({
+  ...(getProviderSettingsMeta(
+    Providers.find((p) => p.identifier === identifier)?.component
+  )?.defaultSettings || {}),
+});
 
 export const textToHtml = (text: string) =>
   text
@@ -123,7 +132,7 @@ export const useCompose = (
     return selected.map((integration) => ({
       integration: { id: integration.id },
       group,
-      settings: {},
+      settings: defaultSettingsOf(integration.identifier),
       value: [
         {
           content: textToHtml(text),
@@ -155,13 +164,11 @@ export const useCompose = (
       );
     }
     if (item.valid === false) {
-      return (
-        item.settingsError ||
-        t(
-          'compose_needs_settings',
-          'This channel needs extra settings, open the full editor'
-        )
+      const needs = t(
+        'compose_needs_settings',
+        'This channel needs extra settings, open the full editor'
       );
+      return item.settingsError ? `${needs} (${item.settingsError})` : needs;
     }
     if (item.errors !== true) {
       return item.errors;

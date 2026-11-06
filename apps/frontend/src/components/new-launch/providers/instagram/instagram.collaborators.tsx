@@ -118,5 +118,6 @@ export default withProvider<InstagramDto>({
   CustomPreviewComponent: InstagramPreview,
   dto: InstagramDto,
   maximumCharacters: 2200,
-  comments: 'no-media'
+  comments: 'no-media',
+  defaultSettings: { post_type: 'post', collaborators: [] },
 });
