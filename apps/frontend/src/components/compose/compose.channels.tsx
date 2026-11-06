@@ -4,6 +4,7 @@ import { FC } from 'react';
 import clsx from 'clsx';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { Integrations } from '@gitroom/frontend/components/launches/calendar.context';
+import { ChannelAvatar } from '@gitroom/frontend/components/launches/channel.avatar';
 
 export const ComposeChannels: FC<{
   available: Integrations[];
@@ -42,11 +43,7 @@ export const ComposeChannels: FC<{
                   : 'border-newBgLineColor text-textItemBlur hover:text-newTextColor'
               )}
             >
-              <img
-                src={integration.picture}
-                alt=""
-                className="w-[24px] h-[24px] rounded-full"
-              />
+              <ChannelAvatar integration={integration} size={24} />
               <span className="max-w-[110px] truncate">{integration.name}</span>
               {active && count && (
                 <span className={clsx('text-[11px]', over && 'text-red-400')}>

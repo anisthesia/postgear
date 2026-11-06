@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { showMediaBox } from '@gitroom/frontend/components/media/media.component';
 import { useCalendar } from '@gitroom/frontend/components/launches/calendar.context';
+import { ChannelAvatar } from '@gitroom/frontend/components/launches/channel.avatar';
 import { useCompose } from '@gitroom/frontend/components/compose/use.compose';
 
 export const QuickPostSheet: FC = () => {
@@ -93,11 +94,7 @@ export const QuickPostSheet: FC = () => {
                   : 'border-newBgLineColor text-textItemBlur'
               )}
             >
-              <img
-                src={integration.picture}
-                alt=""
-                className="w-[30px] h-[30px] rounded-full"
-              />
+              <ChannelAvatar integration={integration} size={30} />
               <span className="max-w-[110px] truncate">{integration.name}</span>
             </button>
           ))}
