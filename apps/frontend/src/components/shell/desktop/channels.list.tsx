@@ -4,7 +4,6 @@ import { FC, useCallback, useMemo } from 'react';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { Integration } from '@prisma/client';
-import ImageWithFallback from '@gitroom/react/helpers/image.with.fallback';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import {
   CalendarContext,
@@ -19,6 +18,7 @@ import { Menu } from '@gitroom/frontend/components/launches/menu/menu';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
+import { ChannelAvatar } from '@gitroom/frontend/components/launches/channel.avatar';
 
 // Reconnect a channel: custom-fields providers (Bluesky, etc.) have no OAuth URL
 // to redirect to, so the credentials are re-entered, like the menu does.
@@ -170,14 +170,7 @@ export const ChannelsList: FC<{ selectable?: boolean }> = ({
                 ),
               })}
             >
-              <ImageWithFallback
-                fallbackSrc={`/icons/platforms/${integration.identifier}.png`}
-                src={integration.picture}
-                className="rounded-full"
-                alt={integration.identifier}
-                width={20}
-                height={20}
-              />
+              <ChannelAvatar integration={integration} size={20} />
               <span className="flex-1 min-w-0 truncate text-start">
                 {integration.name}
               </span>

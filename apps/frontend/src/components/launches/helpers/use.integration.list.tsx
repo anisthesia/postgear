@@ -21,3 +21,25 @@ export const useIntegrationList = () => {
     fallbackData: [],
   });
 };
+// provider display names by identifier, e.g. instagram-standalone -> Instagram (Standalone)
+export const useProviderNames = () => {
+  const fetch = useFetch();
+
+  const load = useCallback(async () => {
+    const { social } = await (await fetch('/integrations')).json();
+    return Object.fromEntries(
+      (social || []).map((p: { identifier: string; name: string }) => [
+        p.identifier,
+        p.name.replace(/\n/g, ' '),
+      ])
+    ) as Record<string, string>;
+  }, [fetch]);
+
+  return useSWR('provider-names', load, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+    revalidateOnMount: true,
+    fallbackData: {},
+  });
+};
