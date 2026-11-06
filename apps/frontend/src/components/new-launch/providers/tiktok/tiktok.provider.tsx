@@ -388,4 +388,16 @@ export default withProvider({
   CustomPreviewComponent: TiktokPreview,
   dto: TikTokDto,
   maximumCharacters: 2000,
+  defaultSettings: {
+    privacy_level: 'PUBLIC_TO_EVERYONE',
+    content_posting_method: 'DIRECT_POST',
+    autoAddMusic: 'no',
+    duet: false,
+    stitch: false,
+    video_made_with_ai: false,
+    comment: true,
+    disclose: false,
+    brand_organic_toggle: false,
+    brand_content_toggle: false,
+  },
 });

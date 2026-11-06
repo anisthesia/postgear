@@ -101,4 +101,5 @@ export default withProvider({
   CustomPreviewComponent: YoutubePreview,
   dto: YoutubeSettingsDto,
   maximumCharacters: 5000,
+  defaultSettings: { type: 'public', selfDeclaredMadeForKids: 'no' },
 });

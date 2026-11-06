@@ -146,4 +146,5 @@ export default withProvider({
     return 280;
   },
   inlineImages: (values) => values?.post_type === 'article',
+  defaultSettings: { post_type: 'post', who_can_reply_post: 'everyone' },
 });
